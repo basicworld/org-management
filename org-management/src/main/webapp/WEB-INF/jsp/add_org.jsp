@@ -1,13 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
-<div style="background-color: #fff;"  class="container">
+<div style="background-color: #fff;"  class="">
 
 	<div class="row">
-		<form id="defaultForm" method="post" action="a.jsp" class="form-horizontal">
+		<form id="defaultForm" method="POST" action="/org/save" class="form-horizontal">
 			<div class="h40 pt5 row" style="background-color: #ddd;">
-				<div class="col-sm-10"></div>
-				<div class="col-sm-2">
+				<div style="text-align:left;" class="col-sm-6"></div>
+				<div style="text-align:right;" class="col-sm-6">
 					<button style="" type="submit" class="btn btn-sm btn-primary" id="saveBtn">提交</button>
 					&nbsp;&nbsp;
 					<button style="" class="btn btn-sm btn-default" id="saveBtn"
@@ -30,23 +30,35 @@
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">统一社会信用代码 <em class="boldRed">*</em></label>
 				<div class="col-sm-6">
-					<input name="orgcode18" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="orgcode18" name="orgcode18" type="text" class="form-control input-sm" id="" placeholder="">
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">组织机构代码</label>
 				<div class="col-sm-6">
-					<input type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="orgcode9" type="text" class="form-control input-sm"
+						id="" placeholder="根据统一社会信用代码自动生成" readonly>
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">接入方式</label>
 				<div class="col-sm-2">
-					<input name="gameMode" type="text" class="form-control input-sm" id="" placeholder="">
+					<select id="gameMode" name="gameMode" class="form-control input-sm">
+						<option value="">网页接入</option>
+						<option value="">接口接入</option>
+						<option value="">进登记</option>
+					</select>
 				</div>
+<!-- 			</div> -->
+<!-- 			<div class="form-group"> -->
 				<label for="lastname" class="col-sm-2 control-label">接入阶段</label>
 				<div class="col-sm-2">
-					<input name="gameStage" type="text" class="form-control input-sm" id="" placeholder="">
+					<select id="gameStage" name="gameStage"
+						class="form-control input-sm">
+						<option value="">培训阶段</option>
+						<option value="">联调阶段</option>
+						<option value="">生产阶段</option>
+					</select>
 				</div>
 			</div>
 			<div class="form-group">
@@ -64,15 +76,14 @@
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">联系人一</label> <label
 					for="lastname" class="col-sm-1 control-label">姓名</label>
-				<div class="col-sm-5">
+				<div class="col-sm-2">
 					<input name="name" type="text" class="form-control input-sm" id="" placeholder="">
+					<span class="help-block"/>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="lastname" class="col-sm-2 control-label"></label> <label
-					for="lastname" class="col-sm-1 control-label">电话</label>
-				<div class="col-sm-5">
+				<label for="lastname" class="col-sm-1 control-label">电话</label>
+				<div class="col-sm-2">
 					<input name="phone" type="text" class="form-control input-sm" id="" placeholder="">
+					<span class="help-block" />
 				</div>
 			</div>
 			<div class="form-group">
@@ -106,11 +117,15 @@
 					<div class="input-group date form_date" data-date=""
 						data-date-format="yyyy-mm-dd" data-link-field="dtp_input2"
 						data-link-format="yyyy-mm-dd">
-						<input name="regDate" class="form-control" size="16" type="text" value=""
-							readonly> <span class="input-group-addon"><span
-							class="glyphicon glyphicon-remove"></span></span> <span
-							class="input-group-addon"><span
-							class="glyphicon glyphicon-calendar"></span></span>
+						<input id="regDate" name="regDate" class="form-control" 
+						size="16" type="text" value=""
+							readonly> 
+							<span class="input-group-addon">
+								<span class="glyphicon glyphicon-remove"></span>
+							</span> 
+							<span class="input-group-addon">
+								<span class="glyphicon glyphicon-calendar"></span>
+							</span>
 					</div>
 					<input type="hidden" id="dtp_input2" value="" />
 				</div>
@@ -127,6 +142,16 @@
 </div>
 <script type="text/javascript">
 $(document).ready(function() {
+// orgcode9 自动生成
+$("#orgcode18").blur(function(){
+	if($.trim(this.value).length == 18){
+		$("#orgcode9").val($.trim(this.value).substring(8,17));
+	}
+}).keyup(function(){
+	$(this).triggerHandler("blur");
+}).focus(function(){
+	$(this).triggerHandler("blur");
+});
 // 日期选择
 $('.form_date').datetimepicker({
 	language : 'zh-CN',
@@ -136,8 +161,10 @@ $('.form_date').datetimepicker({
 	todayHighlight : 1,
 	startView : 2,
 	minView : 2,
+	pickerPosition:'top-left',
 	forceParse : 0
 });
+$("#regDate").val(getNow());  // yyyy-mm-dd
 // 格式校验
 $('#defaultForm')
     .bootstrapValidator({
@@ -191,6 +218,16 @@ $('#defaultForm')
                     }
                 }
             },
+            name: {
+            	message: 'The value is not valid',
+            	validators: {
+                    stringLength: {
+	                    min: 2,
+	                    max: 10,
+	                    message: '姓名长度应在2到10位之间'
+	                },
+                }
+            },
             phone: {
             	message: 'The value is not valid',
             	validators: {
@@ -225,9 +262,19 @@ $('#defaultForm')
         var bv = $form.data('bootstrapValidator');
 
         // Use Ajax to submit form data
-        $.post($form.attr('action'), $form.serialize(), function(result) {
-            console.log(result);
-        }, 'json');
+        $.ajax({  
+            type: $form.attr('method'),   //提交的方法
+            url: $form.attr('action'), //提交的地址  
+            data: JSON.stringify(getFormData($form)),// 序列化表单值  
+            async: true,  
+            error: function(request) {  //失败的话
+                 toastr.error('机构保存失败，请重试');
+            },  
+            success: function(data) {  //成功
+                 toastr.success('机构保存成功');
+                 loadPage("add_org", "#content");
+            }  
+         });
     });
 });
 </script>

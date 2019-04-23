@@ -3,7 +3,34 @@ $(document).ready(function() {
 	loadPage("summary", "#content");
 	loadOrgCount();
 	loadRecentOrgTable();
+	// toastr
+	toastr.options.positionClass = 'toast-bottom-right';
+	
 });
+// json 化form
+function getFormData($form) {
+    var unindexed_array = $form.serializeArray();
+    var indexed_array = {};
+
+    $.map(unindexed_array, function (n, i) {
+      indexed_array[n['name']] = n['value'];
+    });
+
+    return indexed_array;
+}
+
+// yyyy-mm-dd
+function getNow() { 
+	var date = new Date();
+	var y = date.getFullYear();  
+    var m = date.getMonth() + 1;  
+    m = m < 10 ? '0' + m : m;  
+    var d = date.getDate();  
+    d = d < 10 ? ('0' + d) : d;  
+    return y + '-' + m + '-' + d; 
+ 
+};
+
 // 按条件搜索机构 刷新机构列表
 function searchOrg(e){
 	console.log("in searchOrg");

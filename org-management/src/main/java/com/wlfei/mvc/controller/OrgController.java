@@ -39,10 +39,17 @@ public class OrgController {
 		int pageSize = 20;
 		return orgService.getOrgListByPage(pageNum, pageSize);
 	}
-	@RequestMapping(value="/query/", method=RequestMethod.POST)
+	@RequestMapping(value="/query", method=RequestMethod.POST)
 	public @ResponseBody List<Organization> getOrgListInJsonByParm(String searchParm){
 		log.debug("get post data:"+searchParm);
 		return orgService.getTopNOrgList(6);
+	}
+	@RequestMapping(value="/save", method=RequestMethod.POST)
+	@ResponseBody
+	public String doSave(Organization org){
+		log.debug("get post data:"+org);
+//		return orgService.getTopNOrgList(6);
+		return "123";
 	}
 	
 	@RequestMapping(value="/summary", method=RequestMethod.GET)

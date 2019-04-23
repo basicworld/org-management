@@ -18,11 +18,13 @@
 <script type="text/javascript"	src="<%=request.getContextPath()%>/resources/js/bootstrap-datetimepicker.zh-CN.js"></script>
 <script type="text/javascript"	src="<%=request.getContextPath()%>/resources/js/bootstrapValidator.js"></script>
 <script type="text/javascript"	src="<%=request.getContextPath()%>/resources/js/bootstrapValidator.zh-CN.js"></script>
+<script type="text/javascript"	src="<%=request.getContextPath()%>/resources/js/toastr.min.js"></script>
 <!-- css -->
 <link rel="stylesheet"	href="<%=request.getContextPath()%>/resources/css/bootstrap.min.css"	type="text/css" />
 <link rel="stylesheet"	href="<%=request.getContextPath()%>/resources/css/bootstrap-datetimepicker.min.css"	type="text/css" />
 <link rel="stylesheet"	href="<%=request.getContextPath()%>/resources/css/bootstrapValidator.css"	type="text/css" />
 <link rel="stylesheet"	href="<%=request.getContextPath()%>/resources/css/base.css"	type="text/css" />
+<link rel="stylesheet"	href="<%=request.getContextPath()%>/resources/css/toastr.css"	type="text/css" />
 <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
 <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
 <!--[if lt IE 9]>
