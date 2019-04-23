@@ -1,0 +1,27 @@
+@charset "UTF-8";
+.h40 {
+	height: 40px;
+}
+.pt10{
+	padding-top: 10px;
+}
+.pt5{
+	padding-top: 5px;
+}
+.mt10{
+	margin-top: 10px;
+}
+.mt5{
+	margin-top: 5px;
+}
+.textCtr{
+	text-align: center;!important
+}
+.textBC{
+	font-weight: bold;
+	text-align: center;
+}
+.boldRed{
+	color: red;
+	font-weight: bold;
+}
