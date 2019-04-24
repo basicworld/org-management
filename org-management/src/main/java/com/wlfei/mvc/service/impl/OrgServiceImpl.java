@@ -12,8 +12,7 @@ public class OrgServiceImpl implements OrgService {
 	private ContactService contactService = new ContactServiceImpl();
 
 	public Organization getOrgById(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.demoGetOneOrg();
 	}
 
 	public Organization getOrgByOrgcode9(String orgcode9) {
@@ -53,7 +52,7 @@ public class OrgServiceImpl implements OrgService {
 		org.setOrgName("百度");
 		org.setOrgFullname("百度有限公司");
 		org.setOrgcode9("123456789");
-		org.setOrgcode18("222333444123456789X");
+		org.setOrgcode18("222333444123456789");
 		org.setGameStage(1);
 		org.setGameMode(2);
 		org.setTestIp("1.1.1.1");

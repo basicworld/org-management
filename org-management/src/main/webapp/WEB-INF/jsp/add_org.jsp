@@ -6,8 +6,8 @@
 	<div class="row">
 		<form id="defaultForm" method="POST" action="/org/save" class="form-horizontal">
 			<div class="h40 pt5 row" style="background-color: #ddd;">
-				<div style="text-align:left;" class="col-sm-6"></div>
-				<div style="text-align:right;" class="col-sm-6">
+				<div id="navLeft" style="text-align:left;" class="col-sm-6"></div>
+				<div id="navRight" style="text-align:right;" class="col-sm-6">
 					<button style="" type="submit" class="btn btn-sm btn-primary" id="saveBtn">提交</button>
 					&nbsp;&nbsp;
 					<button style="" class="btn btn-sm btn-default" id="saveBtn"
@@ -24,7 +24,7 @@
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">机构全称 <em class="boldRed">*</em></label>
 				<div class="col-sm-6">
-					<input name="orgFullname" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="orgFullname" name="orgFullname" type="text" class="form-control input-sm" id="" placeholder="">
 				</div>
 			</div>
 			<div class="form-group">
@@ -44,9 +44,9 @@
 				<label for="lastname" class="col-sm-2 control-label">接入方式</label>
 				<div class="col-sm-2">
 					<select id="gameMode" name="gameMode" class="form-control input-sm">
-						<option value="">网页接入</option>
-						<option value="">接口接入</option>
-						<option value="">进登记</option>
+						<option value="1">网页接入</option>
+						<option value="2">接口接入</option>
+						<option value="3">进登记</option>
 					</select>
 				</div>
 <!-- 			</div> -->
@@ -55,34 +55,34 @@
 				<div class="col-sm-2">
 					<select id="gameStage" name="gameStage"
 						class="form-control input-sm">
-						<option value="">培训阶段</option>
-						<option value="">联调阶段</option>
-						<option value="">生产阶段</option>
+						<option value="1">培训阶段</option>
+						<option value="2">联调阶段</option>
+						<option value="3">生产阶段</option>
 					</select>
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">测试IP</label>
 				<div class="col-sm-6">
-					<input name="ip" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="testIp" name="ip" type="text" class="form-control input-sm" id="" placeholder="">
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">生产IP</label>
 				<div class="col-sm-6">
-					<input name="ip" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="proIp" name="ip" type="text" class="form-control input-sm" id="" placeholder="">
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">联系人一</label> <label
 					for="lastname" class="col-sm-1 control-label">姓名</label>
 				<div class="col-sm-2">
-					<input name="name" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="name1" name="name1" type="text" class="form-control input-sm" id="" placeholder="">
 					<span class="help-block"/>
 				</div>
 				<label for="lastname" class="col-sm-1 control-label">电话</label>
 				<div class="col-sm-2">
-					<input name="phone" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="phone1" name="phone1" type="text" class="form-control input-sm" id="" placeholder="">
 					<span class="help-block" />
 				</div>
 			</div>
@@ -90,25 +90,25 @@
 				<label for="lastname" class="col-sm-2 control-label"></label> <label
 					for="lastname" class="col-sm-1 control-label">邮箱</label>
 				<div class="col-sm-5">
-					<input name="email" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="email1" name="email1" type="text" class="form-control input-sm" id="" placeholder="">
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">联系人二</label> <label
 					for="lastname" class="col-sm-1 control-label">姓名</label>
 				<div class="col-sm-2">
-					<input name="name" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="name2" name="name2" type="text" class="form-control input-sm" id="" placeholder="">
 				</div>
 				<label for="lastname" class="col-sm-1 control-label">电话</label>
 				<div class="col-sm-2">
-					<input name="phone" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="phone2" name="phone2" type="text" class="form-control input-sm" id="" placeholder="">
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label"></label> <label
 					for="lastname" class="col-sm-1 control-label">邮箱</label>
 				<div class="col-sm-5">
-					<input name="email" type="text" class="form-control input-sm" id="" placeholder="">
+					<input id="email2" name="email2" type="text" class="form-control input-sm" id="" placeholder="">
 				</div>
 			</div>
 			<div class="form-group">
@@ -133,7 +133,7 @@
 			<div class="form-group">
 				<label for="lastname" class="col-sm-2 control-label">备注</label>
 				<div class="col-sm-6">
-					<textarea name="note" type="text" style="resize: none;"
+					<textarea id="note" name="note" type="text" style="resize: none;"
 						class="form-control input-sm" id="" placeholder=""></textarea>
 				</div>
 			</div>
@@ -218,7 +218,7 @@ $('#defaultForm')
                     }
                 }
             },
-            name: {
+            name1: {
             	message: 'The value is not valid',
             	validators: {
                     stringLength: {
@@ -228,7 +228,17 @@ $('#defaultForm')
 	                },
                 }
             },
-            phone: {
+            name2: {
+            	message: 'The value is not valid',
+            	validators: {
+                    stringLength: {
+	                    min: 2,
+	                    max: 10,
+	                    message: '姓名长度应在2到10位之间'
+	                },
+                }
+            },
+            phone1: {
             	message: 'The value is not valid',
             	validators: {
 	                regexp: {
@@ -242,7 +252,28 @@ $('#defaultForm')
 	                },
                 }
             },
-            email: {
+            phone2: {
+            	message: 'The value is not valid',
+            	validators: {
+	                regexp: {
+                        regexp: /^[0-9\-]+$/,
+                        message: '只能包含数字和英文短横线，示例:15611112222'
+                    },
+                    stringLength: {
+	                    min: 6,
+	                    max: 11,
+	                    message: '号码长度应在6到11位之间'
+	                },
+                }
+            },
+            email1: {
+                validators: {
+                    emailAddress: {
+                        message: '邮箱地址不合法'
+                    }
+                }
+            },
+            email2: {
                 validators: {
                     emailAddress: {
                         message: '邮箱地址不合法'
@@ -260,12 +291,13 @@ $('#defaultForm')
 
         // Get the BootstrapValidator instance
         var bv = $form.data('bootstrapValidator');
-
+		console.log(JSON.stringify(getFormData($form, buildOrgFormData)));
         // Use Ajax to submit form data
         $.ajax({  
             type: $form.attr('method'),   //提交的方法
             url: $form.attr('action'), //提交的地址  
-            data: JSON.stringify(getFormData($form)),// 序列化表单值  
+            data: JSON.stringify(getFormData($form, buildOrgFormData)),// 序列化表单值  
+            contentType:'application/json;charset=utf-8',
             async: true,  
             error: function(request) {  //失败的话
                  toastr.error('机构保存失败，请重试');

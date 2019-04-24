@@ -2,9 +2,13 @@ package com.wlfei.mvc.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,9 +48,16 @@ public class OrgController {
 		log.debug("get post data:"+searchParm);
 		return orgService.getTopNOrgList(6);
 	}
+	@RequestMapping(value="/queryById", method=RequestMethod.POST)
+	public @ResponseBody Organization getOrgJsonById(String id){
+		log.debug("get post data:"+id);
+		Organization org = orgService.getOrgById(Integer.parseInt(id));
+		log.debug("org="+ org);
+		return org;
+	}
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	@ResponseBody
-	public String doSave(Organization org){
+	public String doSave(@RequestBody Organization org){
 		log.debug("get post data:"+org);
 //		return orgService.getTopNOrgList(6);
 		return "123";
