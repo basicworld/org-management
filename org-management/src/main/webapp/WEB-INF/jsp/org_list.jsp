@@ -10,12 +10,12 @@
 					<input type="text" class="form-control input-sm" id="searchParm"
 						placeholder="机构名称/代码/IP">
 				</div>
-				<button class="btn btn-sm btn-primary" id="searchBtn" onclick="searchOrg(this)">提交</button>
+				<button class="btn btn-sm btn-primary" id="searchBtn" onclick="searchOrg(this)">搜索</button>
 			</div>
 		</div>
 		<div class="col-sm-4 mt5">
 			<!-- 刷新按钮 -->
-			<a id="reloadBtn" href="#" style="float: right;" onclick=""> <span
+			<a id="reloadBtn" href="#" style="float: right;" pageNum="1"> <span
 				class="glyphicon glyphicon-repeat"></span> 刷新
 			</a>
 		</div>
@@ -36,7 +36,7 @@
 					<th>操作</th>
 				</tr>
 			</thead>
-			<tbody id="orgTableBody" pageNum=""></tbody>
+			<tbody id="orgTableBody"></tbody>
 		</table>
 		<div id="pagerArea">
 			<ul class="pager">
@@ -49,5 +49,9 @@
 <script>
 	$(document).ready(function() {
 		loadOrgTableByPage(1);
+		$("#reloadBtn").click(function(){
+			loadOrgTableByPage($(this).attr("pageNum"));
+			toastr.info('刷新成功');
+		});
 	});
 </script>

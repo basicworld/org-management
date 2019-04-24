@@ -59,8 +59,7 @@ function searchOrg(e){
 				$(".action", trObj).text("详情 编辑 删除");
 				$("#orgTableBody").append(trObj);
 			} // end for
-			$("#orgTableBody").attr("pageNum", pageNum);
-			$("#reloadBtn").attr("onclick", "loadOrgTableByPage(" + pageNum + ")");
+			$("#reloadBtn").attr("pageNum", pageNum);
 			if(pageNum==1){
 				// 无上一页
 				$("#prevPager").attr("class", "disabled");
@@ -119,6 +118,7 @@ function clickHandler(e) {
 
 //分页加载机构
 function loadOrgTableByPage(pageNum) {
+	pageNum = parseInt(pageNum);
 	var urlStr = window.location.protocol + "//" + window.location.host
 			+ "/org/query/page/"+pageNum;
 	// alert(urlStr);
@@ -142,8 +142,8 @@ function loadOrgTableByPage(pageNum) {
 				$(".action", trObj).text("详情 编辑 删除");
 				$("#orgTableBody").append(trObj);
 			} // end for
-			$("#orgTableBody").attr("pageNum", pageNum);
-			$("#reloadBtn").attr("onclick", "loadOrgTableByPage(" + pageNum + ")");
+			$("#reloadBtn").attr("pageNum", pageNum);
+			
 			if(pageNum==1){
 				// 无上一页
 				$("#prevPager").attr("class", "disabled");
@@ -218,9 +218,8 @@ function loadRecentOrgTable(pageNum) {
 }
 // 触发刷新首页数据
 function reloadHomePage() {
-	console.log("in reloadHomePage");
 	loadOrgCount();
 	loadRecentOrgTable();
-	console.log("out reloadHomePage");
+	toastr.info('刷新成功');
 }
 // //////////////////////content js end/////////////////////////////
