@@ -2,12 +2,18 @@ package com.wlfei.mvc.model;
 
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
+
+import com.wlfei.mvc.service.ConfigService;
+import com.wlfei.mvc.service.impl.ConfigServiceImpl;
+
 /**
  * 机构bean
  * @author wlfei
  *
  */
 public class Organization {
+	private ConfigService configService = new ConfigServiceImpl();
 	int id;  // 数据库 id
 	String orgName;  // 机构简称
 	String orgFullname;  // 机构全称

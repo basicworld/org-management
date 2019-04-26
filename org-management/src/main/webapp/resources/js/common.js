@@ -5,10 +5,69 @@ $(document).ready(function() {
 	loadRecentOrgTable();
 	// toastr
 	toastr.options.positionClass = 'toast-bottom-right';
+	// 
+	toastr.info('欢迎登陆:' + "wlifei");
 	
 });
+
+// 渲染操作区 主要是按钮
+function wrapOperateArea(){
+	console.log("in wrapOperateArea");
+	// 获取参数 从#pageParm.attr("value")  json格式数据 
+	// 例如 pageParm.pageType = "summary"; 就是渲染summary.jsp 的页面  pageParm.pageNum = 0; 表示没有分页
+	var pageParm = JSON.parse($("#pageParm").attr("value"));
+	console.log(pageParm.pageType);
+	switch(pageParm.pageType)
+	{
+	case "summary":
+		// 渲染左区 搜索按钮
+		// 渲染右区 刷新按钮  保存按钮
+		$("#rightWell").html("<button id='reloadBtn' class='btn btn-sm btn-default' onclick='reloadPage()'> <span class='glyphicon glyphicon-refresh'></span> 刷新 </button>");
+		break;
+	case "org_insert":
+		$("#operateArea").attr("class", "h40 pt5"); // 解决宽度不一致问题
+		// 渲染左区 搜索按钮
+		// 渲染右区 刷新按钮  保存按钮
+		$("#rightWell").html("<button type='submit' class='btn btn-sm btn-primary' id='saveBtn'><span class='glyphicon glyphicon-ok'></span> 保存</button> &nbsp;&nbsp; <button class='btn btn-sm btn-default' id='reloadBtn' onclick='reloadPage()'><span class='glyphicon glyphicon-remove'></span> 重置</button>");
+		break;
+	case "org_detail":
+		// 渲染右区 刷新按钮  保存按钮
+		$("#rightWell").html("<button class='btn btn-sm btn-default' id='editBtn' onclick='editPage()'><span class='glyphicon glyphicon-edit'></span> 编辑</button> &nbsp;&nbsp; <button class='btn btn-sm btn-primary' id='downloadBtn'><span class='glyphicon glyphicon-cloud-download'></span> 下载 </button>  &nbsp;&nbsp; <button class='btn btn-sm btn-primary' id='deleteBtn'><span class='glyphicon glyphicon-trash'></span> 删除 </button>");
+		break;
+	case "org_list":
+		// 渲染左区 搜索按钮
+		$("#leftWell").html("<div class='form-inline'> <div class='form-group'> <input type='text' class='form-control input-sm' id='searchParm' placeholder='机构名称/代码/IP'> </div> <button class='btn btn-sm btn-primary' id='searchBtn' onclick='searchOrg(this)'><span class='glyphicon glyphicon-search'></span> 搜索</button> </div>");
+		// 渲染右区 刷新按钮  保存按钮
+		$("#rightWell").html("<button id='reloadBtn' class='btn btn-sm btn-default' onclick='reloadPage()'> <span class='glyphicon glyphicon-refresh'></span> 刷新 </button>");
+		break;
+	default:
+		break;
+	}
+	console.log("out wrapOperateArea");
+}
+// 页面刷新
+function reloadPage(){
+	// 获取参数 从#pageParm.attr("value")  json格式数据 
+	var pageParm = JSON.parse($("#pageParm").attr("value"));
+	switch(pageParm.pageType)
+	{
+	case "summary":
+		loadOrgCount();
+		loadRecentOrgTable();
+		toastr.info('刷新成功');
+		break;
+	case "org_insert":
+		// 加载一个空页面
+		loadPage("org_insert","#content",initOrgInsertPage);
+		toastr.info('重置成功');
+		break;
+	default:
+		break;
+	}
+}
 // 根据机构id获取机构
 function getOrgById(id, callback){
+	console.log("in getOrgById");
 	var urlStr = window.location.protocol + "//" + window.location.host + "/org/queryById/";
 	var pageNum = 1;
 	$.ajax({
@@ -22,37 +81,74 @@ function getOrgById(id, callback){
 		    }
 		}
 	}); // end ajax
+	console.log("out getOrgById");
 }
-// 渲染机构编辑页面
-function wrapOrgPage(org){
+// 渲染机构页面  org -- 机构var  pos--渲染的类型，val=value  text=text  patentId--渲染的父 div id
+function wrapOrgPage(org, pos, parentId){
 	org = unpackOrgData(org);
-	console.log(org.name1);
-	$("#defaultForm").find("#orgName").val(org.orgName);
-	$("#defaultForm").find("#orgFullname").val(org.orgFullname);
-	$("#defaultForm").find("#orgcode18").val(org.orgcode18);
-	$("#defaultForm").find("#orgcode9").val(org.orgcode9);
-	$("#defaultForm").find("#gameMode").val(org.gameMode);
-	$("#defaultForm").find("#gameStage").val(org.gameStage);
-	$("#defaultForm").find("#testIp").val(org.testIp);
-	$("#defaultForm").find("#proIp").val(org.proIp);
-	$("#defaultForm").find("#name1").val(org.name1);
-	$("#defaultForm").find("#phone1").val(org.phone1);
-	$("#defaultForm").find("#email1").val(org.email1);
-	$("#defaultForm").find("#name2").val(org.name2);
-	$("#defaultForm").find("#phone2").val(org.phone2);
-	$("#defaultForm").find("#email2").val(org.email2);
-	$("#defaultForm").find("#regDate").val(org.regDate);
-	$("#defaultForm").find("#note").val(org.note);
+	toastr.info(org["orgName"]);
+	targetIds = ["orgName", "orgFullname", "orgcode18", "orgcode9", "gameMode", "gameStage", "testIp", "proIp", "name1", "phone1", "email1", "name2", "phone2", "email2", "regDate", "note",];
+	for (var i=0; i< targetIds.length; i++){
+		targetId = targetIds[i];
+		if(pos == "val"){
+			$(parentId).find("#" + targetId).val(org[targetId]);
+			
+		} else if(pos == "text"){
+			$(parentId).find("#" + targetId).text(org[targetId]);
+			
+		}
+	}
+}
+// 机构列表区页面跳转后页面的返回按钮 添加到操作区的leftWell
+function wrapOperateAreaWithBtn(backPageInfo){
+	console.log("in wrapOperateAreaWithBackBtn");
+	$("#leftWell").html("<button id='backBtn' class='btn btn-sm btn-default' onclick='backToLastPage()'> <span class='glyphicon glyphicon-chevron-left'></span> 返回列表 </button>");
+	$("#rightWell").html("<button type='submit' class='btn btn-sm btn-primary' id='saveBtn'><span class='glyphicon glyphicon-ok'></span> 保存</button></div>");
+	console.log("out wrapOperateAreaWithBackBtn");
+}
+// 返回按钮动作
+function backToLastPage(){
+	$("#content").empty();
+	loadPage("org_list","#content", initOrgListPage);
 }
 // 查看机构详情
 function showDetail(e){
+	toastr.info('showDetail');
 	// 查询机构id
 	var id = $(e).parent().parent().children("td.listId").text();
-	// 加载一个空页面
-	loadPage("add_org","#content");
-	alert("id=" + id);
-	// 根据机构id获取机构信息 并渲染到空页面
-	getOrgById(id, wrapOrgPage);
+	// 查询本页面的pageParm
+	var backPageInfo = JSON.parse($("#pageParm").attr("value"));
+	// 加载一个空页面  回调加载数据 并加载按钮
+	loadPage("org_detail","#content", function(){
+		getOrgById(id, function(org){
+			wrapOrgPage(org, "text", "#orgDetailTable");
+		});
+		wrapOperateAreaWithBtn(backPageInfo);
+	});
+	
+	
+}
+// 删除机构
+function delOrg(e){
+	toastr.error('delOrg');
+}
+// 修改机构 
+function editOrg(e){
+	// 查询机构id
+	var id = $(e).parent().parent().children("td.listId").text();
+	// 查询本页面的pageParm
+	var backPageInfo = JSON.parse($("#pageParm").attr("value"));
+	// 加载一个空页面  回调加载数据 并加载按钮
+	loadPage("org_insert","#content", function(){
+		getOrgById(id, function(org){
+			wrapOrgPage(org, "val", "#defaultForm");
+		});
+		initOrgInsertPage(function(){
+			backToLastPage();  // todo 待修改成提交保存 并返回到列表
+			toastr.info('修改成功，返回到列表页面');
+		});
+		wrapOperateAreaWithBtn(backPageInfo);
+	});
 }
 // build org page form data 把联系人map组装为list
 function buildOrgFormData(array){
@@ -86,7 +182,6 @@ function unpackOrgData(org){
 			org.name1=contact1.name;
 			org.phone1=contact1.phone;
 			org.email1=contact1.email;
-			console.log(contact1.email);
 		}
 		if (contactList.length >0){
 			contact2=contactList.pop();
@@ -126,6 +221,7 @@ function getNow() {
 };
 // 加载机构列表 到 #wrapId
 function wrapOrgList(data, wrapId, pageNum){
+	pageNum = parseInt(pageNum);
 	$(wrapId).empty();
 	var orgList = data;
 	var org;
@@ -138,7 +234,11 @@ function wrapOrgList(data, wrapId, pageNum){
 		$(".orgName", trObj).text(org.orgName);
 		$(".orgFullname", trObj).text(org.orgFullname);
 		$(".orgcode18", trObj).text(org.orgcode18);
-		$(".gameModeStage", trObj).text(org.gameMode+ " " + org.gameStage);
+		
+		var gameMode = getConfig("gameMode", org.gameMode);
+		var gameStage = getConfig("gameStage", org.gameStage);
+		$(".gameModeStage", trObj).text(gameMode+ "-" + gameStage);
+		
 		$(".regDate", trObj).text(org.regDate);
 		$(".action", trObj).html(actionHtml);
 		$("#orgTableBody").append(trObj);
@@ -166,37 +266,57 @@ function wrapOrgList(data, wrapId, pageNum){
 }
 // 按条件搜索机构 刷新机构列表
 function searchOrg(e){
-	console.log("in searchOrg");
-	searchParm = $("#searchParm").val();
 	var urlStr = window.location.protocol + "//" + window.location.host + "/org/query/";
-	var pageNum = 1;
+	var jsonData = {};
+	jsonData["searchType"] = "parm.like(orgName,orgFullname,testIp,porIp)+page=list";  // 查询条件： 机构名称 或 ip，分页查询，返回list
+	var pageParm = JSON.parse($("#pageParm").attr("value"));
+	var pageNum = pageParm.pageNum;
+	jsonData["page"] = pageNum;
+	jsonData["parm"] = $("#searchParm").val();
 	$.ajax({
-		method : "POST",
+		type : "POST",
 		url : urlStr,
-		dataType: "json",
-        data: { searchParm: searchParm },
+        data: JSON.stringify(jsonData),
+        contentType:'application/json;charset=utf-8',
+        async: true, 
 		success : function(data, status, jqXHR) {
 			wrapOrgList(data, "#orgTableBody", pageNum);
 		}
 	}); // end ajax
-	console.log("out searchOrg");
 }
-// 菜单栏点击后加载相应页面
+// 菜单栏点击后的动作--加载相应页面
 function loadArea(e){
 //	alert(e.getAttribute("value"));
 	var navValue = e.getAttribute("value");
-	loadPage(navValue,"#content");
+	switch(navValue)
+	{
+	case "org_insert":  // 需要初始化数据 js 和按钮
+		loadPage(navValue,"#content", initOrgInsertPage);
+		break;
+	case "org_list":  // 需要初始化数据 js 和按钮
+		loadPage(navValue,"#content", initOrgListPage);
+		break;
+	case "summary":  // 需要初始化数据 js 和按钮
+		loadPage(navValue,"#content", initSummaryPage);
+		break;
+	default:
+		loadPage(navValue,"#content");
+	}
 }
 //  用模板渲染 areaId处的网页
-function loadPage(pageName, areaId) {
+// callback 函数，初始化js、页面按钮用
+function loadPage(pageName, areaId, callback) {
 	var urlStr = window.location.protocol + "//" + window.location.host
 			+ "/org-man/template/" + pageName;
 	$.ajax({
 		method : "GET",
 		url : urlStr,
 		success : function(data, status, jqXHR) {
-			var page = data;
-			$(areaId).html(page);
+			$(areaId).html(data);  // 加载静态页面
+			// 初始化js、页面按钮 等动态内容
+			if (typeof callback === "function"){
+		        callback();
+		    }
 		}
 	}); // end ajax
 }
@@ -278,10 +398,221 @@ function loadRecentOrgTable(pageNum) {
 	}); // end ajax
 	console.log("out loadRecentOrgTable");
 }
-// 触发刷新首页数据
-function reloadHomePage() {
+
+// //////////////////////content js end/////////////////////////////
+// 初始化新建机构页面
+function initOrgInsertPage(callback){
+	console.log("in initOrgInsertPage");
+	// 设置页面参数
+	var pageParm = {"pageType": "org_insert", "pageNum": 0};
+	$("#pageParm").attr("value", JSON.stringify(pageParm));
+	// 操作区
+	wrapOperateArea();
+	// orgcode9 自动生成
+	$("#orgcode18").blur(function(){
+		if($.trim(this.value).length == 18){
+			$("#orgcode9").val($.trim(this.value).substring(8,17));
+		}
+	}).keyup(function(){
+		$(this).triggerHandler("blur");
+	}).focus(function(){
+		$(this).triggerHandler("blur");
+	});
+	// 日期选择
+	$('.form_date').datetimepicker({
+		language : 'zh-CN',
+		weekStart : 1,
+		todayBtn : 1,
+		autoclose : 1,
+		todayHighlight : 1,
+		startView : 2,
+		minView : 2,
+		pickerPosition:'top-left',
+		forceParse : 0
+	});
+	$("#regDate").val(getNow());  // yyyy-mm-dd
+	// 格式校验
+	$('#defaultForm')
+	    .bootstrapValidator({
+	        message: 'This value is not valid',
+	        feedbackIcons: {
+	            valid: 'glyphicon glyphicon-ok',
+	            invalid: 'glyphicon glyphicon-remove',
+	            validating: 'glyphicon glyphicon-refresh'
+	        },
+	        fields: {
+	        	orgName: {
+	                message: 'The orgName is not valid',
+	                validators: {
+	                    notEmpty: {
+	                        message: '机构简称不能为空'
+	                    }
+	                }
+	            },
+	        	orgFullname: {
+	                message: 'The orgFullname is not valid',
+	                validators: {
+	                    notEmpty: {
+	                        message: '机构全称不能为空'
+	                    }
+	                }
+	            },
+	            
+	        	orgcode18: {
+	                message: 'The orgFullname is not valid',
+	                validators: {
+	                    notEmpty: {
+	                        message: '统一社会信用代码不能为空'
+	                    },
+		                stringLength: {
+		                    min: 18,
+		                    max: 18,
+		                    message: '统一社会信用代码必须为18位'
+		                },
+		                regexp: {
+	                        regexp: /^[a-zA-Z0-9]+$/,
+	                        message: '统一社会信用代码必须为英文字母和数字的组合，不能含有特殊字符'
+	                    }
+	                }
+	            },
+	            ip: {
+	            	message: 'The value is not valid',
+	            	validators: {
+		                regexp: {
+	                        regexp: /^[0-9\.;]+$/,
+	                        message: '只能包含IP和英文分号，示例:1.1.1.1;2.2.2.2'
+	                    }
+	                }
+	            },
+	            name1: {
+	            	message: 'The value is not valid',
+	            	validators: {
+	                    stringLength: {
+		                    min: 2,
+		                    max: 10,
+		                    message: '姓名长度应在2到10位之间'
+		                },
+	                }
+	            },
+	            name2: {
+	            	message: 'The value is not valid',
+	            	validators: {
+	                    stringLength: {
+		                    min: 2,
+		                    max: 10,
+		                    message: '姓名长度应在2到10位之间'
+		                },
+	                }
+	            },
+	            phone1: {
+	            	message: 'The value is not valid',
+	            	validators: {
+		                regexp: {
+	                        regexp: /^[0-9\-]+$/,
+	                        message: '只能包含数字和英文短横线，示例:15611112222'
+	                    },
+	                    stringLength: {
+		                    min: 6,
+		                    max: 11,
+		                    message: '号码长度应在6到11位之间'
+		                },
+	                }
+	            },
+	            phone2: {
+	            	message: 'The value is not valid',
+	            	validators: {
+		                regexp: {
+	                        regexp: /^[0-9\-]+$/,
+	                        message: '只能包含数字和英文短横线，示例:15611112222'
+	                    },
+	                    stringLength: {
+		                    min: 6,
+		                    max: 11,
+		                    message: '号码长度应在6到11位之间'
+		                },
+	                }
+	            },
+	            email1: {
+	                validators: {
+	                    emailAddress: {
+	                        message: '邮箱地址不合法'
+	                    }
+	                }
+	            },
+	            email2: {
+	                validators: {
+	                    emailAddress: {
+	                        message: '邮箱地址不合法'
+	                    }
+	                }
+	            },
+	        }
+	    })
+	    .on('success.form.bv', function(e) {
+	        // Prevent form submission
+	        e.preventDefault();
+	        // Get the form instance
+	        var $form = $(e.target);
+	        
+	        // Get the BootstrapValidator instance
+	        var bv = $form.data('bootstrapValidator');
+	        // Use Ajax to submit form data
+	        $.ajax({  
+	        	type: $form.attr('method'),   //提交的方法
+	        	url: $form.attr('action'), //提交的地址  
+	        	data: JSON.stringify(getFormData($form, buildOrgFormData)),// 序列化表单值  
+	        	contentType:'application/json;charset=utf-8',
+	        	async: true,  
+	        	error: function(request) {  //失败的话
+	        		toastr.error('机构保存失败，请重试');
+	        	},  
+	        	success: function(data) {  //成功
+	        		toastr.success('机构保存成功');
+	        		if (typeof callback === "function"){
+	    		        callback(data);
+	    		    }
+	        	}  
+	        });
+	    });
+}
+function initOrgListPage() {
+	// 设置页面参数
+	var pageParm = {"pageType": "org_list", "pageNum": 1, "pageName": "org_list", "searchParm":""};
+	$("#pageParm").attr("value", JSON.stringify(pageParm));
+	// 加载操作区 按钮
+	wrapOperateArea();
+	// 获取机构列表
+	loadOrgTableByPage(1);
+	$('#searchBtn').trigger("click");
+	$("#reloadBtn").click(function(){
+		$('#searchBtn').trigger("click");
+		toastr.info('刷新成功');
+	});
+}
+// 
+function initSummaryPage() {
+	// 设置页面参数
+	var pageParm = {"pageType": "summary", "pageNum": 0};
+	$("#pageParm").attr("value", JSON.stringify(pageParm));
+	// 加载操作区 按钮
+	wrapOperateArea();
+	// 加载数据
 	loadOrgCount();
 	loadRecentOrgTable();
-	toastr.info('刷新成功');
 }
-// //////////////////////content js end/////////////////////////////
+
+function getConfig(key, subKey){
+	var configs = {
+		"gameMode": {"1": "网页", "2": "接口"},
+		"gameStage": {"2": "联调阶段", "3": "生产阶段", "1": "培训阶段"},
+	};
+	if (key != null && subKey !=null) {
+		return configs[key][subKey];
+		
+	}else if(key != null){
+		return configs[key];
+		
+	}else {
+		return "";
+	}
+}

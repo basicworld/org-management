@@ -1,26 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
 <div style="background-color: #fff;">
-	<div class="h40 pt5 row" style="background-color: #ddd;">
-		<div class="col-sm-8">
-			<!-- 搜索区 -->
-			<div class="form-inline">
-				<div class="form-group">
-					<input type="text" class="form-control input-sm" id="searchParm"
-						placeholder="机构名称/代码/IP">
-				</div>
-				<button class="btn btn-sm btn-primary" id="searchBtn" onclick="searchOrg(this)">搜索</button>
-			</div>
-		</div>
-		<div class="col-sm-4 mt5">
-			<!-- 刷新按钮 -->
-			<a id="reloadBtn" href="#" style="float: right;" pageNum="1"> <span
-				class="glyphicon glyphicon-repeat"></span> 刷新
-			</a>
-		</div>
-
-	</div>
+	<!-- 操作区 -->
+	<%@ include file="operate_area.jsp"%>
 	<div id="orgList">
 		<!-- 机构分页列表 -->
 		<table class="table table-condensed" id="recentOrgTable">
@@ -46,12 +28,3 @@
 		</div>
 	</div>
 </div>
-<script>
-	$(document).ready(function() {
-		loadOrgTableByPage(1);
-		$("#reloadBtn").click(function(){
-			loadOrgTableByPage($(this).attr("pageNum"));
-			toastr.info('刷新成功');
-		});
-	});
-</script>

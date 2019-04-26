@@ -1,5 +1,6 @@
 package com.wlfei.mvc.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.wlfei.mvc.model.Organization;
+import com.wlfei.mvc.model.SearchBean;
 import com.wlfei.mvc.model.Summary;
 import com.wlfei.mvc.service.OrgService;
 import com.wlfei.mvc.service.impl.OrgServiceImpl;
@@ -44,9 +46,19 @@ public class OrgController {
 		return orgService.getOrgListByPage(pageNum, pageSize);
 	}
 	@RequestMapping(value="/query", method=RequestMethod.POST)
-	public @ResponseBody List<Organization> getOrgListInJsonByParm(String searchParm){
-		log.debug("get post data:"+searchParm);
-		return orgService.getTopNOrgList(6);
+	@ResponseBody
+	public List<Organization> getOrgListInJsonByParm(@RequestBody SearchBean searchBean){
+		log.debug("get post data:"+searchBean);
+		switch (searchBean.getSearchType()) {
+		case "parm.like(orgName,orgFullname,testIp,porIp)+page=list":
+			if ("" == searchBean.getParm()) {
+				int pageSize = 20;
+				return orgService.getOrgListByPage(searchBean.getPage(), pageSize);
+			}
+			return orgService.getTopNOrgList(6);
+		default:
+			return new ArrayList<Organization>();
+		}
 	}
 	@RequestMapping(value="/queryById", method=RequestMethod.POST)
 	public @ResponseBody Organization getOrgJsonById(String id){

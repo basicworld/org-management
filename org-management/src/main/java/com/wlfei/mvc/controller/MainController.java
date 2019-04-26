@@ -20,12 +20,13 @@ public class MainController {
 	
 	@RequestMapping(value="/template/{pageName}",method=RequestMethod.GET)
 	public String getTemplate(@PathVariable("pageName") String pageName) {
+		log.info("get {} page", pageName);
 		return pageName;
 	}
-	
 	@RequestMapping(value="/home",method=RequestMethod.GET)
 	public String toHome() {
 		log.info("get home page");
 		return "home";
 	}
+	
 }

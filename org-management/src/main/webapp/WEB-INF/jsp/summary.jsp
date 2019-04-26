@@ -2,21 +2,8 @@
 	pageEncoding="UTF-8"%>
 
 <div style="background-color: #fff;">
-	<div class="h40 pt5 row" style="background-color: #ddd;">
-		<div class="col-sm-8">
-			<!-- 搜索区 -->
-			
-		</div>
-		<div class="col-sm-4 mt5">
-			<!-- 刷新按钮 -->
-			<a id="reloadBtn" href="#" style="float: right;"
-				onclick="reloadHomePage()"> <span
-				class="glyphicon glyphicon-repeat"></span> 刷新
-			</a>
-		</div>
-
-
-	</div>
+	<!-- 操作区 -->
+	<%@ include file="operate_area.jsp"%>
 	<div>
 		<!-- 总体报表 -->
 		<div>
@@ -81,6 +68,11 @@
 </div>
 <script>
 	$(document).ready(function() {
+		// 设置页面参数
+		var pageParm = {"pageType": "summary", "pageNum": 0};
+		$("#pageParm").attr("value", JSON.stringify(pageParm));
+		// 加载操作区 按钮
+		wrapOperateArea();
 		// 加载数据
 		loadOrgCount();
 		loadRecentOrgTable();
