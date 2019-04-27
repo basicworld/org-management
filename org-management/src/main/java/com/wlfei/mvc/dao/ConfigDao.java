@@ -1,9 +1,11 @@
-package com.wlfei.mvc.service;
+package com.wlfei.mvc.dao;
 
 import java.util.List;
 
 import com.wlfei.mvc.model.Config;
 
-public interface ConfigService {
+// 配置信息接口
+public interface ConfigDao {
+	// 根据key获取value
 	public List<Config> getConfig(String key);
 }
