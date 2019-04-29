@@ -27,8 +27,22 @@ public class Organization {
 	String proKey; // 生产Key
 	List<Contact> contactList; // 机构联系人
 	String regDate; // 登记时间
-//	boolean isDelete; // 删除标记  0 未删除 1 删除
+	boolean isDelete; // 删除标记  0 未删除 1 删除
+	String address; //快递地址
 	String note; //备注
+	
+	public String getAddress() {
+		return address;
+	}
+	public boolean isDelete() {
+		return isDelete;
+	}
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
 	public int getId() {
 		return id;
 	}

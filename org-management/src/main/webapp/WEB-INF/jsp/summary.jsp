@@ -3,7 +3,16 @@
 
 <div style="background-color: #fff;">
 	<!-- 操作区 -->
-	<%@ include file="operate_area.jsp"%>
+	<div id="operateArea" class="h40 pt5 row"
+		style="background-color: #eee;">
+		<!-- 页面参数保存 -->
+		<div id="pageParm" value='{"pageName": "summary"}' style="display: none"></div>
+		<!-- 两个按钮区 -->
+		<div id="leftWell" style="text-align: left;" class="col-sm-6"></div>
+		<div id="rightWell" style="text-align: right;" class="col-sm-6">
+			<button id='reloadBtn' class='btn btn-sm btn-default' onclick='refresh()'> <span class='glyphicon glyphicon-refresh'></span> 刷新 </button>
+		</div>
+	</div>
 	<div>
 		<!-- 总体报表 -->
 		<div>
@@ -66,15 +75,3 @@
 		</div>
 	</div>
 </div>
-<script>
-	$(document).ready(function() {
-		// 设置页面参数
-		var pageParm = {"pageType": "summary", "pageNum": 0};
-		$("#pageParm").attr("value", JSON.stringify(pageParm));
-		// 加载操作区 按钮
-		wrapOperateArea();
-		// 加载数据
-		loadOrgCount();
-		loadRecentOrgTable();
-	});
-</script>

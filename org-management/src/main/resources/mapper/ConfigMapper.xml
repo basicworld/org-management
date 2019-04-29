@@ -3,7 +3,8 @@
 <!--命名空间应该是对应接口的包名+类名 -->
 <mapper namespace="com.wlfei.mvc.dao.ConfigDao">
     <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
-    <select id="getConfig" resultType="com.wlfei.mvc.model.Config" parameterType="java.lang.String">
-        select * from config where `key`=#{key}
+    <select id="getConfigValue" resultType="com.wlfei.mvc.model.Config" parameterType="com.wlfei.mvc.model.Config">
+        select * from config where `key`=#{key} and `sub_key`=#{subKey}
     </select>
+   
 </mapper>

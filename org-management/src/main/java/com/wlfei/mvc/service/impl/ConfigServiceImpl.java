@@ -1,5 +1,6 @@
 package com.wlfei.mvc.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,13 @@ public class ConfigServiceImpl implements ConfigService {
 	private ConfigDao configDao;
 	
 	@Override
-	public List<Config> getConfig(String key) {
-		List<Config> config = configDao.getConfig(key);
-		return config;
+	public List<Config> getConfigService(Config config) {
+		List<Config> configList = new ArrayList<Config>();
+		if (config.getSubKey() == null) {
+			configList = configDao.getConfigWithOneKey(config.getKey());
+		} else {
+			configList = configDao.getConfigWithTwoKey(config.getKey(), config.getSubKey());
+		}
+		return configList;
 	}
-
-
 }

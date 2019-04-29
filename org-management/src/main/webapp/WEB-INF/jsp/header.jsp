@@ -4,7 +4,7 @@
 	<div class="col-sm-1"></div>
 	<div class="col-sm-10">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="/org-man/home">LOGO 机构信息管理系统</a>
+			<a class="navbar-brand" href="/oms/home">LOGO 机构信息管理系统</a>
 		</div>
 
 		<div>

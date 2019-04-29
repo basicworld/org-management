@@ -11,8 +11,10 @@ import com.wlfei.mvc.service.OrgService;
 public class OrgServiceImpl implements OrgService {
 	private ContactService contactService = new ContactServiceImpl();
 
-	public Organization getOrgById(Integer id) {
-		return this.demoGetOneOrg();
+	public List<Organization> getOrgById(Integer id) {
+		List<Organization> orgList = new ArrayList<Organization>();
+		orgList.add(this.demoGetOneOrg());
+		return orgList;
 	}
 
 	public Organization getOrgByOrgcode9(String orgcode9) {

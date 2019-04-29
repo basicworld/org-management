@@ -1,5 +1,6 @@
 package com.wlfei.mvc.model;
 
+// 配置bean
 public class Config {
 	private int id;
 	private String key;

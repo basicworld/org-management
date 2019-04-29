@@ -1,90 +1,60 @@
+// 
 $(document).ready(function() {
-	// 初次加载后，显示概览页--首页
-	loadPage("summary", "#content");
-	loadOrgCount();
-	loadRecentOrgTable();
-	// toastr
 	toastr.options.positionClass = 'toast-bottom-right';
-	// 
-	toastr.info('欢迎登陆:' + "wlifei");
+	// 初次加载后，显示概览页--首页
+	loadPage("summary", "#content", function(){
+		initSummaryPage();
+		toastr.info('欢迎登陆:' + "wlifei");
+	});
 	
 });
-
-// 渲染操作区 主要是按钮
-function wrapOperateArea(){
-	console.log("in wrapOperateArea");
-	// 获取参数 从#pageParm.attr("value")  json格式数据 
-	// 例如 pageParm.pageType = "summary"; 就是渲染summary.jsp 的页面  pageParm.pageNum = 0; 表示没有分页
-	var pageParm = JSON.parse($("#pageParm").attr("value"));
-	console.log(pageParm.pageType);
-	switch(pageParm.pageType)
-	{
-	case "summary":
-		// 渲染左区 搜索按钮
-		// 渲染右区 刷新按钮  保存按钮
-		$("#rightWell").html("<button id='reloadBtn' class='btn btn-sm btn-default' onclick='reloadPage()'> <span class='glyphicon glyphicon-refresh'></span> 刷新 </button>");
-		break;
-	case "org_insert":
-		$("#operateArea").attr("class", "h40 pt5"); // 解决宽度不一致问题
-		// 渲染左区 搜索按钮
-		// 渲染右区 刷新按钮  保存按钮
-		$("#rightWell").html("<button type='submit' class='btn btn-sm btn-primary' id='saveBtn'><span class='glyphicon glyphicon-ok'></span> 保存</button> &nbsp;&nbsp; <button class='btn btn-sm btn-default' id='reloadBtn' onclick='reloadPage()'><span class='glyphicon glyphicon-remove'></span> 重置</button>");
-		break;
-	case "org_detail":
-		// 渲染右区 刷新按钮  保存按钮
-		$("#rightWell").html("<button class='btn btn-sm btn-default' id='editBtn' onclick='editPage()'><span class='glyphicon glyphicon-edit'></span> 编辑</button> &nbsp;&nbsp; <button class='btn btn-sm btn-primary' id='downloadBtn'><span class='glyphicon glyphicon-cloud-download'></span> 下载 </button>  &nbsp;&nbsp; <button class='btn btn-sm btn-primary' id='deleteBtn'><span class='glyphicon glyphicon-trash'></span> 删除 </button>");
-		break;
-	case "org_list":
-		// 渲染左区 搜索按钮
-		$("#leftWell").html("<div class='form-inline'> <div class='form-group'> <input type='text' class='form-control input-sm' id='searchParm' placeholder='机构名称/代码/IP'> </div> <button class='btn btn-sm btn-primary' id='searchBtn' onclick='searchOrg(this)'><span class='glyphicon glyphicon-search'></span> 搜索</button> </div>");
-		// 渲染右区 刷新按钮  保存按钮
-		$("#rightWell").html("<button id='reloadBtn' class='btn btn-sm btn-default' onclick='reloadPage()'> <span class='glyphicon glyphicon-refresh'></span> 刷新 </button>");
-		break;
-	default:
-		break;
-	}
-	console.log("out wrapOperateArea");
+// 用模板渲染 areaId处的网页
+// tag: CRUD
+function loadPage(pageName, areaId, callback) {
+	$.ajax({
+		method : "GET",
+		url : window.location.protocol + "//" + window.location.host + "/oms/page/" + pageName,
+		async: false,
+		data: {},
+		success : function(data, status, jqXHR) {
+			$(areaId).html(data);  // 加载静态页面
+			if (typeof callback === "function"){
+		        callback();
+		    }
+		},
+		error: function(){
+			toastr.error("loadPage error：服务器连接失败");
+		}
+	}); // end ajax
 }
-// 页面刷新
-function reloadPage(){
+
+// 内容刷新 从页面的operatearea的隐藏div中获取页面信息，然后根据信息进行刷新
+function refresh(){
 	// 获取参数 从#pageParm.attr("value")  json格式数据 
 	var pageParm = JSON.parse($("#pageParm").attr("value"));
-	switch(pageParm.pageType)
+	switch(pageParm.pageName)
 	{
 	case "summary":
-		loadOrgCount();
-		loadRecentOrgTable();
-		toastr.info('刷新成功');
+		initSummaryPage();
+		toastr.info('summary刷新成功');
 		break;
 	case "org_insert":
 		// 加载一个空页面
 		loadPage("org_insert","#content",initOrgInsertPage);
-		toastr.info('重置成功');
+		toastr.info('org_insert重置成功');
+		break;
+	case "org_list":
+		getOrgList(renderOrgListPage, 0);
+		toastr.info('org_list刷新成功');
 		break;
 	default:
+		toastr.info('refresh error: 刷新异常');
 		break;
 	}
 }
-// 根据机构id获取机构
-function getOrgById(id, callback){
-	console.log("in getOrgById");
-	var urlStr = window.location.protocol + "//" + window.location.host + "/org/queryById/";
-	var pageNum = 1;
-	$.ajax({
-		method : "POST",
-		url : urlStr,
-		dataType: "json",
-        data: { id: id },
-		success : function(data, status, jqXHR) {
-			if (typeof callback === "function"){
-		        callback(data);
-		    }
-		}
-	}); // end ajax
-	console.log("out getOrgById");
-}
+
 // 渲染机构页面  org -- 机构var  pos--渲染的类型，val=value  text=text  patentId--渲染的父 div id
-function wrapOrgPage(org, pos, parentId){
+function renderOrgPage(org, pos, parentId){
 	org = unpackOrgData(org);
 	toastr.info(org["orgName"]);
 	targetIds = ["orgName", "orgFullname", "orgcode18", "orgcode9", "gameMode", "gameStage", "testIp", "proIp", "name1", "phone1", "email1", "name2", "phone2", "email2", "regDate", "note",];
@@ -99,31 +69,24 @@ function wrapOrgPage(org, pos, parentId){
 		}
 	}
 }
-// 机构列表区页面跳转后页面的返回按钮 添加到操作区的leftWell
-function wrapOperateAreaWithBtn(backPageInfo){
-	console.log("in wrapOperateAreaWithBackBtn");
-	$("#leftWell").html("<button id='backBtn' class='btn btn-sm btn-default' onclick='backToLastPage()'> <span class='glyphicon glyphicon-chevron-left'></span> 返回列表 </button>");
-	$("#rightWell").html("<button type='submit' class='btn btn-sm btn-primary' id='saveBtn'><span class='glyphicon glyphicon-ok'></span> 保存</button></div>");
-	console.log("out wrapOperateAreaWithBackBtn");
-}
 // 返回按钮动作
 function backToLastPage(){
 	$("#content").empty();
 	loadPage("org_list","#content", initOrgListPage);
 }
 // 查看机构详情
-function showDetail(e){
-	toastr.info('showDetail');
+function showOrgDetail(e){
+	toastr.info('showOrgDetail');
 	// 查询机构id
 	var id = $(e).parent().parent().children("td.listId").text();
-	// 查询本页面的pageParm
-	var backPageInfo = JSON.parse($("#pageParm").attr("value"));
 	// 加载一个空页面  回调加载数据 并加载按钮
 	loadPage("org_detail","#content", function(){
-		getOrgById(id, function(org){
-			wrapOrgPage(org, "text", "#orgDetailTable");
+		var pageParm = {"pageNum": 0, "pageName": "org_detail", "searchParm":id};
+		$("#pageParm").attr("value", JSON.stringify(pageParm));
+		getOrgList(function(pageParm, orgList){
+			org = orgList[0];
+			renderOrgPage(org, "text", "#orgDetailTable");
 		});
-		wrapOperateAreaWithBtn(backPageInfo);
 	});
 	
 	
@@ -139,15 +102,14 @@ function editOrg(e){
 	// 查询本页面的pageParm
 	var backPageInfo = JSON.parse($("#pageParm").attr("value"));
 	// 加载一个空页面  回调加载数据 并加载按钮
-	loadPage("org_insert","#content", function(){
+	loadPage("org_edit","#content", function(){
 		getOrgById(id, function(org){
-			wrapOrgPage(org, "val", "#defaultForm");
+			renderOrgPage(org, "val", "#defaultForm");
 		});
 		initOrgInsertPage(function(){
 			backToLastPage();  // todo 待修改成提交保存 并返回到列表
 			toastr.info('修改成功，返回到列表页面');
 		});
-		wrapOperateAreaWithBtn(backPageInfo);
 	});
 }
 // build org page form data 把联系人map组装为list
@@ -208,7 +170,8 @@ function getFormData($form, callback) {
     return indexed_array;
 }
 
-// yyyy-mm-dd
+// 获取时间 
+// 返回时间字符串，格式：yyyy-mm-dd
 function getNow() { 
 	var date = new Date();
 	var y = date.getFullYear();  
@@ -219,13 +182,14 @@ function getNow() {
     return y + '-' + m + '-' + d; 
  
 };
-// 加载机构列表 到 #wrapId
-function wrapOrgList(data, wrapId, pageNum){
-	pageNum = parseInt(pageNum);
-	$(wrapId).empty();
+// 加载机构列表 到机构列表页面用于org_list
+function renderOrgListPage(pageParm, data){
+	console.log("renderOrgListPage");
+	$("#orgTableBody").empty(); // 清空数据
+	var pageNum = parseInt(pageParm.pageNum);
 	var orgList = data;
 	var org;
-	var actionHtml = "<a href='#' onclick='showDetail(this)'>详情</a> <a href='#' onclick='editOrg(this)'>编辑</a> <a href='#' onclick='delOrg(this)'>删除</a>";
+	var actionHtml = "<a href='#' onclick='showOrgDetail(this)'>详情</a> <a href='#' onclick='editOrg(this)'>编辑</a> <a href='#' onclick='delOrg(this)'>删除</a>";
 	for (var i = 0; i < orgList.length; i++) {
 		org = orgList[i];
 		var text = "<tr> <td class='listId'></td><td class='orgName'></td> <td class='orgFullname'></td><td class='orgcode18'></td> <td class='gameModeStage'></td> <td class='regDate'></td><td class='action'></td> </tr>";
@@ -243,7 +207,7 @@ function wrapOrgList(data, wrapId, pageNum){
 		$(".action", trObj).html(actionHtml);
 		$("#orgTableBody").append(trObj);
 	} // end for
-	$("#reloadBtn").attr("pageNum", pageNum);
+	// 如果当前页是第一页，则没有 上一页
 	if(pageNum==1){
 		// 无上一页
 		$("#prevPager").attr("class", "disabled");
@@ -251,8 +215,11 @@ function wrapOrgList(data, wrapId, pageNum){
 	}else{
 		// 有上一页
 		$("#prevPager").attr("class", "active");
-		$("#prevPager").attr("onclick", "loadOrgTableByPage(" + (pageNum-1) + ")");
+		$("#prevPager").attr("onclick", "getOrgList(renderOrgListPage, -1)");
 	}
+	// 如果返回机构数量小于pagesize=20，说明没有下一页
+	// 存在一个bug：如果刚好返回20家机构而且没有下一家，下一页按钮也能触发，但是下一页是空的
+	// 不解决，太复杂
 	if(orgList.length < 20){
 		// 无下一页
 		$("#nextPager").attr("class", "disabled");
@@ -260,33 +227,49 @@ function wrapOrgList(data, wrapId, pageNum){
 	} else{
 		// 有下一页
 		$("#nextPager").attr("class", "active");
-		$("#nextPager").attr("onclick", "loadOrgTableByPage(" + (pageNum +1) + ")");
+		$("#nextPager").attr("onclick", "getOrgList(renderOrgListPage, 1)");
 	}
+	$("#pageParm").attr("value", JSON.stringify(pageParm));  // 查询参数写回pageParm
 	
 }
-// 按条件搜索机构 刷新机构列表
-function searchOrg(e){
-	var urlStr = window.location.protocol + "//" + window.location.host + "/org/query/";
-	var jsonData = {};
-	jsonData["searchType"] = "parm.like(orgName,orgFullname,testIp,porIp)+page=list";  // 查询条件： 机构名称 或 ip，分页查询，返回list
+// 按条件搜索机构 用于org_list
+// 条件来自pageParm
+// adder用来搜索别的页，搜索下一页adder=1  搜索上一页adder=-1
+// 回调函数必须满足形式：callback(pageParm, request_return_data);
+function getOrgList(callback, adder){
+	console.log("getOrgList=" + $("#pageParm").attr("value"));
 	var pageParm = JSON.parse($("#pageParm").attr("value"));
-	var pageNum = pageParm.pageNum;
-	jsonData["page"] = pageNum;
-	jsonData["parm"] = $("#searchParm").val();
+	if (typeof adder != "undefined"){
+		pageParm.pageNum += parseInt(adder);
+	}
 	$.ajax({
-		type : "POST",
-		url : urlStr,
-        data: JSON.stringify(jsonData),
-        contentType:'application/json;charset=utf-8',
-        async: true, 
+		type : "GET",
+		url : window.location.protocol + "//" + window.location.host + "/oms/orgs",
+		async: true,
+		data: pageParm,
+		dataType: 'json',
 		success : function(data, status, jqXHR) {
-			wrapOrgList(data, "#orgTableBody", pageNum);
+			if (typeof callback === "function"){
+		        callback(pageParm, data);
+		    }
+		},
+		error: function(){
+			toastr.error("getOrgList error：服务器连接失败");
 		}
 	}); // end ajax
 }
+
+//  org list page search button action
+function orgSearchBtnAction(){
+	// 把查询参数写入到searchParm
+	console.log("orgSrchBtnAction");
+	var pageParm = JSON.parse($("#pageParm").attr("value"));
+	pageParm.searchParm = $("#searchParm").val();
+	$("#pageParm").attr("value", JSON.stringify(pageParm));
+	getOrgList(renderOrgListPage); // 获取机构 加载机构到页面
+}
 // 菜单栏点击后的动作--加载相应页面
-function loadArea(e){
-//	alert(e.getAttribute("value"));
+function navAction(e){
 	var navValue = e.getAttribute("value");
 	switch(navValue)
 	{
@@ -294,32 +277,18 @@ function loadArea(e){
 		loadPage(navValue,"#content", initOrgInsertPage);
 		break;
 	case "org_list":  // 需要初始化数据 js 和按钮
-		loadPage(navValue,"#content", initOrgListPage);
+		loadPage(navValue,"#content", function(){
+			getOrgList(renderOrgListPage); // 获取机构 加载机构到页面
+		});
 		break;
 	case "summary":  // 需要初始化数据 js 和按钮
-		loadPage(navValue,"#content", initSummaryPage);
+		initSummaryPage();
 		break;
 	default:
 		loadPage(navValue,"#content");
 	}
 }
-//  用模板渲染 areaId处的网页
-// callback 函数，初始化js、页面按钮用
-function loadPage(pageName, areaId, callback) {
-	var urlStr = window.location.protocol + "//" + window.location.host
-			+ "/org-man/template/" + pageName;
-	$.ajax({
-		method : "GET",
-		url : urlStr,
-		success : function(data, status, jqXHR) {
-			$(areaId).html(data);  // 加载静态页面
-			// 初始化js、页面按钮 等动态内容
-			if (typeof callback === "function"){
-		        callback();
-		    }
-		}
-	}); // end ajax
-}
+
 // 导航栏动作
 function clickHandler(e) {
 	if (e.target instanceof HTMLUListElement)
@@ -334,29 +303,15 @@ function clickHandler(e) {
 
 }
 
-//分页加载机构
-function loadOrgTableByPage(pageNum) {
-	pageNum = parseInt(pageNum);
-	var urlStr = window.location.protocol + "//" + window.location.host
-			+ "/org/query/page/"+pageNum;
-	// alert(urlStr);
-	$.ajax({
-		method : "GET",
-		url : urlStr,
-		success : function(data, status, jqXHR) {
-			wrapOrgList(data, "#orgTableBody", pageNum);
-		}
-	}); // end ajax
-}
 // //////////////////////content js start/////////////////////////////
-// 加载机构汇总
-function loadOrgCount() {
-	console.log("in loadOrgCount");
-	var urlStr = window.location.protocol + "//" + window.location.host
-			+ "/org/summary";
+// 加载机构汇总信息
+// CRUD
+function loadSummary() {
 	$.ajax({
-		method : "GET",
-		url : urlStr,
+		type : "GET",
+		url : window.location.protocol + "//" + window.location.host + "/oms/summary",
+		async: true,
+		dataType: 'json',
 		success : function(data, status, jqXHR) {
 			var summary = data;
 			$("#proIntCount").text(summary.proIntCount);
@@ -368,35 +323,11 @@ function loadOrgCount() {
 			$("#intCount").text(summary.intCount);
 			$("#webCount").text(summary.webCount);
 			$("#totalCount").text(summary.totalCount);
-		}
+		},
+		error: function(request) {  //失败的话
+    		toastr.error('loadSummary error: 服务器连接失败');
+    	},
 	}); // end ajax
-	console.log("out loadOrgCount");
-}
-// 加载近期添加机构
-function loadRecentOrgTable(pageNum) {
-	console.log("in loadRecentOrgTable");
-	var urlStr = window.location.protocol + "//" + window.location.host
-			+ "/org/query?top5";
-	$.ajax({
-		method : "GET",
-		url : urlStr,
-		success : function(data, status, jqXHR) {
-			$("#recentOrgTableBody").empty();
-			var orgList = data;
-			var org;
-			for (var i = 0; i < orgList.length; i++) {
-				org = orgList[i];
-				var text = "<tr> <td class='listId'></td> <td class='orgFullname'></td> <td class='gameModeStage'></td> <td class='regDate'></td> </tr>";
-				var trObj = $(text);
-				$(".listId", trObj).text(i+1);
-				$(".orgFullname", trObj).text(org.orgFullname);
-				$(".gameModeStage", trObj).text(org.gameMode+ " " + org.gameStage);
-				$(".regDate", trObj).text(org.regDate);
-				$("#recentOrgTableBody").append(trObj);
-			} // end for
-		}
-	}); // end ajax
-	console.log("out loadRecentOrgTable");
 }
 
 // //////////////////////content js end/////////////////////////////
@@ -406,8 +337,6 @@ function initOrgInsertPage(callback){
 	// 设置页面参数
 	var pageParm = {"pageType": "org_insert", "pageNum": 0};
 	$("#pageParm").attr("value", JSON.stringify(pageParm));
-	// 操作区
-	wrapOperateArea();
 	// orgcode9 自动生成
 	$("#orgcode18").blur(function(){
 		if($.trim(this.value).length == 18){
@@ -575,30 +504,28 @@ function initOrgInsertPage(callback){
 	        });
 	    });
 }
-function initOrgListPage() {
-	// 设置页面参数
-	var pageParm = {"pageType": "org_list", "pageNum": 1, "pageName": "org_list", "searchParm":""};
-	$("#pageParm").attr("value", JSON.stringify(pageParm));
-	// 加载操作区 按钮
-	wrapOperateArea();
-	// 获取机构列表
-	loadOrgTableByPage(1);
-	$('#searchBtn').trigger("click");
-	$("#reloadBtn").click(function(){
-		$('#searchBtn').trigger("click");
-		toastr.info('刷新成功');
-	});
-}
-// 
+
+// summary 页面刷新： 加载空页面 加载数据
 function initSummaryPage() {
-	// 设置页面参数
-	var pageParm = {"pageType": "summary", "pageNum": 0};
-	$("#pageParm").attr("value", JSON.stringify(pageParm));
-	// 加载操作区 按钮
-	wrapOperateArea();
-	// 加载数据
-	loadOrgCount();
-	loadRecentOrgTable();
+	loadPage("summary", "#content", function(){
+		var pageParm = JSON.parse($("#pageParm").attr("value"));
+		loadSummary();
+		getOrgList(function(pageParm, data){
+			$("#recentOrgTableBody").empty();
+			var orgList = data;
+			var org;
+			for (var i = 0; i < orgList.length; i++) {
+				org = orgList[i];
+				var text = "<tr> <td class='listId'></td> <td class='orgFullname'></td> <td class='gameModeStage'></td> <td class='regDate'></td> </tr>";
+				var trObj = $(text);
+				$(".listId", trObj).text(i+1);
+				$(".orgFullname", trObj).text(org.orgFullname);
+				$(".gameModeStage", trObj).text(org.gameMode+ " " + org.gameStage);
+				$(".regDate", trObj).text(org.regDate);
+				$("#recentOrgTableBody").append(trObj);
+			} // end for
+		});
+	});
 }
 
 function getConfig(key, subKey){

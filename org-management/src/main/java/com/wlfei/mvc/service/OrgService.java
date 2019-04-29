@@ -7,7 +7,7 @@ import com.wlfei.mvc.model.Summary;
 
 public interface OrgService {
 	// 根据id获取机构
-	Organization getOrgById(Integer id); 
+	List<Organization> getOrgById(Integer id); 
 	// 根据9为机构代码获取机构
 	Organization getOrgByOrgcode9(String orgcode9); 
 	// 根据18位机构代码获取机构
