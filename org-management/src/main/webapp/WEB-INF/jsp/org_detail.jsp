@@ -8,10 +8,24 @@
 		<div id="pageParm" value="{}" style="display: none"></div>
 		<!-- 两个按钮区 -->
 		<div id="leftWell" style="text-align: left;" class="col-sm-6">
-			<button id='backBtn' class='btn btn-sm btn-default' onclick='backToLastPage()'> <span class='glyphicon glyphicon-chevron-left'></span> 返回列表 </button>
+			<button id='prevPageBtn' class='btn btn-sm btn-default'
+				onclick='prevPageBtnAction()'>
+				<span class='glyphicon glyphicon-chevron-left'></span> 返回列表
+			</button>
 		</div>
 		<div id="rightWell" style="text-align: right;" class="col-sm-6">
-			<button class='btn btn-sm btn-default' id='editBtn' onclick='editPage()'><span class='glyphicon glyphicon-edit'></span> 编辑</button> &nbsp;&nbsp; <button class='btn btn-sm btn-primary' id='downloadBtn'><span class='glyphicon glyphicon-cloud-download'></span> 下载 </button>  &nbsp;&nbsp; <button class='btn btn-sm btn-primary' id='deleteBtn'><span class='glyphicon glyphicon-trash'></span> 删除 </button>
+			<button class='btn btn-sm btn-default' id='editBtn'
+				onclick='editPage()'>
+				<span class='glyphicon glyphicon-edit'></span> 编辑
+			</button>
+			&nbsp;&nbsp;
+			<button class='btn btn-sm btn-default' id='downloadBtn'>
+				<span class='glyphicon glyphicon-cloud-download'></span> 下载
+			</button>
+			&nbsp;&nbsp;
+			<button class='btn btn-sm btn-danger' id='deleteBtn' onclick='delOrg(this,false,prevPageBtnAction)'>
+				<span class='glyphicon glyphicon-trash'></span> 删除
+			</button>
 		</div>
 	</div>
 	<div id="orgDetail" class="col-sm-10">

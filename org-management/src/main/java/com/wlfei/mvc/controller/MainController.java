@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.wlfei.mvc.dao.ConfigDao;
 import com.wlfei.mvc.model.Config;
 import com.wlfei.mvc.model.Organization;
@@ -33,6 +34,14 @@ import com.wlfei.mvc.service.impl.OrgServiceImpl;
 @Controller
 @RequestMapping("/oms") // organization management system机构管理平台
 public class MainController {
+	// 从配置库查询config信息的service 依赖mybatis
+	@Autowired
+	private ConfigService configService;
+	// logger
+	private static Logger log = LoggerFactory.getLogger(MainController.class);
+	// 机构处理 service
+	@Autowired
+	private OrgService orgService;
 	///////////////// page controller start ////////////////////////
 	// 首页
 	@RequestMapping(value = { "/home", "/", ""}, method = RequestMethod.GET)
@@ -77,74 +86,36 @@ public class MainController {
 				return orgService.getOrgListByPage(pageNum, 20);
 			}
 		case "org_detail":
-			int id = Integer.parseInt(request.getParameter("searchParm"));
-			return orgService.getOrgById(id);
+			return orgService.getOrgById(Integer.parseInt(request.getParameter("searchParm")));
+		case "org_edit":
+			return orgService.getOrgById(Integer.parseInt(request.getParameter("searchParm")));
 		default:
 			break;
 		}
-		log.info("getOrgList parm:" + request.getParameterMap());
-//		String searchType = String.valueOf(request.getParameter("searchType"));
-//		searchBean.setPage(page);
-//		searchBean.setSearchType(searchType);
-		return new ArrayList();
-//		orgService.getOrgListByPage(page, 20);
+		return null;
+	}
+	// update org list
+	@RequestMapping(value = {"/orgs"}, method = RequestMethod.PUT)
+	@ResponseBody
+	public List<String> updateOrgList(HttpServletRequest request) {
+		List<Organization> orgList = JSON.parseArray(request.getParameter("orgList"), Organization.class) ;
+		log.info("updateOrgList" + orgList.get(0));
+		List<String> ids = new ArrayList<String>();
+		ids.add("" + orgList.get(0).getId());
+		return ids; // 返回机构id的列表  列表是为了支持多机构的批量修改
+	}
+	// insert new  org list
+	@RequestMapping(value = {"/orgs"}, method = RequestMethod.POST)
+	@ResponseBody
+	public List<String> insertOrgList(HttpServletRequest request) {
+		List<Organization> orgList = JSON.parseArray(request.getParameter("orgList"), Organization.class) ;
+		List<String> ids = new ArrayList<String>();
+		for(Organization org: orgList) {
+			ids.add("" + orgService.insertOrgService(org));
+		}
+		return ids; // 返回机构id的列表  列表是为了支持多机构的批量修改
 	}
 	///////////////// organization controller end ////////////////////////
-	
-	
-	
-	// 从配置库查询config信息的service 依赖mybatis
-	@Autowired
-	private ConfigService configService;
-	// logger
-	private static Logger log = LoggerFactory.getLogger(MainController.class);
-	// 机构处理 service
-	private OrgService orgService = new OrgServiceImpl();
-
-	// 查询top5的机构 即将弃用
-	@RequestMapping(value = "/org", method = RequestMethod.POST)
-	public @ResponseBody List<Organization> doOrgQuery() {
-		return orgService.getTopNOrgList(5);
-	}
-	// 查询top5的机构 即将弃用
-	@RequestMapping(value = "/query", method = RequestMethod.GET, params = "top5")
-	public @ResponseBody List<Organization> getOrgListInJson() {
-		return orgService.getTopNOrgList(5);
-	}
-
-	// 分页 查询机构列表 即将弃用
-	@RequestMapping(value = "/query/page/{pageNum}", method = RequestMethod.GET)
-	public @ResponseBody List<Organization> getOrgListInJsonByPage(@PathVariable("pageNum") Integer pageNum) {
-		log.debug("get org list by page, pageNum={}", pageNum);
-		int pageSize = 20;
-		return orgService.getOrgListByPage(pageNum, pageSize);
-	}
-
-//	// 多模查询机构信息接口
-//	@RequestMapping(value = "/query", method = RequestMethod.POST)
-//	@ResponseBody
-//	public List<Organization> getOrgListInJsonByParm(@RequestBody SearchBean searchBean) {
-//		log.debug("get post data:" + searchBean);
-//		switch (searchBean.getSearchType()) {
-//		case "parm.like(orgName,orgFullname,testIp,porIp)+page=list":
-//			if ("" == searchBean.getParm()) {
-//				int pageSize = 20;
-//				return orgService.getOrgListByPage(searchBean.getPage(), pageSize);
-//			}
-//			return orgService.getTopNOrgList(6);
-//		default:
-//			return new ArrayList<Organization>();
-//		}
-//	}
-
-	// 保存机构
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	@ResponseBody
-	public String doSave(@RequestBody Organization org) {
-		log.debug("get post data:" + org);
-//		return orgService.getTopNOrgList(6);
-		return "123";
-	}
 
 	// 获取首页的数据
 	@RequestMapping(value = "/summary", method = RequestMethod.GET)

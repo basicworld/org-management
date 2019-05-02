@@ -32,6 +32,7 @@ function loadPage(pageName, areaId, callback) {
 function refresh(){
 	// 获取参数 从#pageParm.attr("value")  json格式数据 
 	var pageParm = JSON.parse($("#pageParm").attr("value"));
+	console.log("refresh:"+pageParm.pageName);
 	switch(pageParm.pageName)
 	{
 	case "summary":
@@ -39,9 +40,13 @@ function refresh(){
 		toastr.info('summary刷新成功');
 		break;
 	case "org_insert":
+//		document.getElementById("defaultForm").reset()
 		// 加载一个空页面
-		loadPage("org_insert","#content",initOrgInsertPage);
-		toastr.info('org_insert重置成功');
+		loadPage("org_insert","#content", function(){
+			initOrgInsertPage(refresh);
+		});
+//		loadPage("org_insert","#content", initOrgInsertPage);
+//		toastr.info('org_insert重置成功');
 		break;
 	case "org_list":
 		getOrgList(renderOrgListPage, 0);
@@ -56,7 +61,7 @@ function refresh(){
 // 渲染机构页面  org -- 机构var  pos--渲染的类型，val=value  text=text  patentId--渲染的父 div id
 function renderOrgPage(org, pos, parentId){
 	org = unpackOrgData(org);
-	toastr.info(org["orgName"]);
+//	toastr.info("加载机构信息："+org["orgName"]);
 	targetIds = ["orgName", "orgFullname", "orgcode18", "orgcode9", "gameMode", "gameStage", "testIp", "proIp", "name1", "phone1", "email1", "name2", "phone2", "email2", "regDate", "note",];
 	for (var i=0; i< targetIds.length; i++){
 		targetId = targetIds[i];
@@ -69,17 +74,18 @@ function renderOrgPage(org, pos, parentId){
 		}
 	}
 }
-// 返回按钮动作
-function backToLastPage(){
+// 机构详情、机构编辑页面的 返回按钮动作
+function prevPageBtnAction(){
 	$("#content").empty();
-	loadPage("org_list","#content", initOrgListPage);
+	loadPage("org_list","#content", function(){
+		getOrgList(renderOrgListPage); // 获取机构 加载机构到页面
+	});
 }
 // 查看机构详情
 function showOrgDetail(e){
-	toastr.info('showOrgDetail');
 	// 查询机构id
-	var id = $(e).parent().parent().children("td.listId").text();
-	// 加载一个空页面  回调加载数据 并加载按钮
+	var id = parseInt($(e).attr("orgId"));
+	// 加载一个空页面  回调加载数据
 	loadPage("org_detail","#content", function(){
 		var pageParm = {"pageNum": 0, "pageName": "org_detail", "searchParm":id};
 		$("#pageParm").attr("value", JSON.stringify(pageParm));
@@ -92,25 +98,62 @@ function showOrgDetail(e){
 	
 }
 // 删除机构
-function delOrg(e){
-	toastr.error('delOrg');
+// e=this
+// confirm 确认标记 true/false/null 如果确认 再真正执行删除  没有确认标记只进行删除警告
+// callback 删除之后的动作
+function delOrg(e, confirm, callback){
+	var pageParm = JSON.parse($("#pageParm").attr("value"));
+	// 查询机构id
+	var id = parseInt($(e).attr("orgId"));
+	// 如果第一次点击删除按钮，则标记为待删除 
+	if (typeof confirm == "undefined" || confirm == false){
+		// 机构列表页面的删除，删除后刷新页面
+		if (pageParm.pageName == "org_list"){
+			$(e).attr("onclick", 'delOrg(this, true, refresh)');
+			$(e).parents("tr").first().addClass("text-danger text-bold");
+		}
+		// 机构详情页面的删除，删除后返回到机构列表
+		if (pageParm.pageName == "org_detail"){
+			$(e).attr("onclick", 'delOrg(this,true,prevPageBtnAction)');
+			$("tbody").addClass("text-danger text-bold");
+		}
+		toastr.error('再次点击删除按钮执行删除');
+	} else if( confirm == true ){ // 真正执行删除
+		// todo  ajax 执行删除
+		toastr.error("删除成功");
+		if(typeof callback == 'function' ){
+			callback();
+		}
+//		if (pageParm.pageName == "org_list"){
+//			refresh();
+//		}else if(pageParm.pageName == "org_detail"){
+//			
+//		}
+	}
 }
 // 修改机构 
 function editOrg(e){
 	// 查询机构id
-	var id = $(e).parent().parent().children("td.listId").text();
-	// 查询本页面的pageParm
-	var backPageInfo = JSON.parse($("#pageParm").attr("value"));
-	// 加载一个空页面  回调加载数据 并加载按钮
+	var id = parseInt($(e).attr("orgId"));
+	// 加载一个空页面  回调加载数据
 	loadPage("org_edit","#content", function(){
-		getOrgById(id, function(org){
-			renderOrgPage(org, "val", "#defaultForm");
-		});
-		initOrgInsertPage(function(){
-			backToLastPage();  // todo 待修改成提交保存 并返回到列表
+		// 初始化新建机构页面的js动作，回调函数是保存按钮提交后的动作
+		initOrgInsertPage(function(){  
+			loadPage("org_list","#content", function(){ 
+				getOrgList(renderOrgListPage); // 获取机构 加载机构到页面
+			});
 			toastr.info('修改成功，返回到列表页面');
 		});
+		// 构建查询参数 查询机构信息后渲染到机构编辑页面
+		var pageParm = {"pageNum": 0, "pageName": "org_edit", "searchParm":id};
+		$("#pageParm").attr("value", JSON.stringify(pageParm));
+		toastr.info("editOrg:"+JSON.stringify(pageParm));
+		getOrgList(function(pageParm, orgList){
+			org = orgList[0];
+			renderOrgPage(org, "val", "#defaultForm");
+		});
 	});
+	
 }
 // build org page form data 把联系人map组装为list
 function buildOrgFormData(array){
@@ -189,12 +232,12 @@ function renderOrgListPage(pageParm, data){
 	var pageNum = parseInt(pageParm.pageNum);
 	var orgList = data;
 	var org;
-	var actionHtml = "<a href='#' onclick='showOrgDetail(this)'>详情</a> <a href='#' onclick='editOrg(this)'>编辑</a> <a href='#' onclick='delOrg(this)'>删除</a>";
+	var actionHtml = "<div><a href='#' onclick='showOrgDetail(this)' orgId=''> 详情</a> <a href='#' onclick='editOrg(this)' orgId=''> 编辑</a> <a href='#' onclick='delOrg(this)' orgId=''> 删除</a></div>";
 	for (var i = 0; i < orgList.length; i++) {
 		org = orgList[i];
-		var text = "<tr> <td class='listId'></td><td class='orgName'></td> <td class='orgFullname'></td><td class='orgcode18'></td> <td class='gameModeStage'></td> <td class='regDate'></td><td class='action'></td> </tr>";
+		var text = "<tr> <td class='orgId'></td><td class='orgName'></td> <td class='orgFullname'></td><td class='orgcode18'></td> <td class='gameModeStage'></td> <td class='regDate'></td><td class='action'></td> </tr>";
 		var trObj = $(text);
-		$(".listId", trObj).text(org.id);
+		$(".orgId", trObj).text(org.id);
 		$(".orgName", trObj).text(org.orgName);
 		$(".orgFullname", trObj).text(org.orgFullname);
 		$(".orgcode18", trObj).text(org.orgcode18);
@@ -204,7 +247,11 @@ function renderOrgListPage(pageParm, data){
 		$(".gameModeStage", trObj).text(gameMode+ "-" + gameStage);
 		
 		$(".regDate", trObj).text(org.regDate);
-		$(".action", trObj).html(actionHtml);
+		
+		// 操作按钮配置
+		var actionObj = $(actionHtml).find("a").each(function(i,e){$(e).attr("orgId", org.id)});
+		$(".action", trObj).html(actionObj);
+		
 		$("#orgTableBody").append(trObj);
 	} // end for
 	// 如果当前页是第一页，则没有 上一页
@@ -274,7 +321,9 @@ function navAction(e){
 	switch(navValue)
 	{
 	case "org_insert":  // 需要初始化数据 js 和按钮
-		loadPage(navValue,"#content", initOrgInsertPage);
+		loadPage(navValue,"#content", function(){
+			initOrgInsertPage(refresh);
+		});
 		break;
 	case "org_list":  // 需要初始化数据 js 和按钮
 		loadPage(navValue,"#content", function(){
@@ -331,12 +380,9 @@ function loadSummary() {
 }
 
 // //////////////////////content js end/////////////////////////////
-// 初始化新建机构页面
+// 初始化新建机构页面的js动作
 function initOrgInsertPage(callback){
 	console.log("in initOrgInsertPage");
-	// 设置页面参数
-	var pageParm = {"pageType": "org_insert", "pageNum": 0};
-	$("#pageParm").attr("value", JSON.stringify(pageParm));
 	// orgcode9 自动生成
 	$("#orgcode18").blur(function(){
 		if($.trim(this.value).length == 18){
@@ -489,18 +535,21 @@ function initOrgInsertPage(callback){
 	        $.ajax({  
 	        	type: $form.attr('method'),   //提交的方法
 	        	url: $form.attr('action'), //提交的地址  
-	        	data: JSON.stringify(getFormData($form, buildOrgFormData)),// 序列化表单值  
-	        	contentType:'application/json;charset=utf-8',
 	        	async: true,  
-	        	error: function(request) {  //失败的话
-	        		toastr.error('机构保存失败，请重试');
-	        	},  
+	        	data: {
+	        		_method: $form.attr('method'),
+	        		'orgList': JSON.stringify([getFormData($form, buildOrgFormData)]),
+	        	},// 序列化表单值  
+	        	dataType: 'json',
 	        	success: function(data) {  //成功
 	        		toastr.success('机构保存成功');
 	        		if (typeof callback === "function"){
-	    		        callback(data);
-	    		    }
-	        	}  
+	        			callback(data);
+	        		}
+	        	}, 
+	        	error: function(request) {  //失败的话
+	        		toastr.error('机构保存失败，请重试');
+	        	},  
 	        });
 	    });
 }
@@ -509,7 +558,9 @@ function initOrgInsertPage(callback){
 function initSummaryPage() {
 	loadPage("summary", "#content", function(){
 		var pageParm = JSON.parse($("#pageParm").attr("value"));
+		// 机构汇总信息
 		loadSummary();
+		// 近期添加的机构
 		getOrgList(function(pageParm, data){
 			$("#recentOrgTableBody").empty();
 			var orgList = data;

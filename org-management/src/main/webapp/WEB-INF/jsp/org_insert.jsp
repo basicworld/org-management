@@ -4,17 +4,24 @@
 <div style="background-color: #fff;" class="">
 
 	<div class="row">
-		<form id="defaultForm" method="POST" action="/org/save"
+		<form id="defaultForm" method="POST" action="/oms/orgs"
 			class="form-horizontal">
 			<!-- 操作区 -->
-			<div id="operateArea" class="h40 pt5"
-				style="background-color: #eee;">
+			<div id="operateArea" class="h40 pt5" style="background-color: #eee;">
 				<!-- 页面参数保存 -->
-				<div id="pageParm" value="{}" style="display: none"></div>
+				<div id="pageParm" value='{"pageNum": 0, "pageName": "org_insert"}'
+					style="display: none"></div>
 				<!-- 两个按钮区 -->
 				<div id="leftWell" style="text-align: left;" class="col-sm-6"></div>
 				<div id="rightWell" style="text-align: right;" class="col-sm-6">
-					<button type='submit' class='btn btn-sm btn-primary' id='saveBtn'><span class='glyphicon glyphicon-ok'></span> 保存</button> &nbsp;&nbsp; <button class='btn btn-sm btn-default' id='reloadBtn' onclick='reloadPage()'><span class='glyphicon glyphicon-remove'></span> 重置</button>
+					<button type='submit' class='btn btn-sm btn-primary' id='saveBtn'>
+						<span class='glyphicon glyphicon-ok'></span> 保存
+					</button>
+					&nbsp;&nbsp;
+					<button type='' class='btn btn-sm btn-default' id='refreshBtn'
+						onclick='refresh()'>
+						<span class='glyphicon glyphicon-remove'></span> 重置
+					</button>
 				</div>
 			</div>
 

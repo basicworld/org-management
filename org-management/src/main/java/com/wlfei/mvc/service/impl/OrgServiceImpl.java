@@ -3,12 +3,25 @@ package com.wlfei.mvc.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wlfei.mvc.controller.MainController;
+import com.wlfei.mvc.dao.OrgDao;
 import com.wlfei.mvc.model.Organization;
 import com.wlfei.mvc.model.Summary;
 import com.wlfei.mvc.service.ContactService;
 import com.wlfei.mvc.service.OrgService;
 
+@Service
 public class OrgServiceImpl implements OrgService {
+	private static Logger log = LoggerFactory.getLogger(MainController.class);
+	// dao
+	@Autowired
+	private OrgDao orgDao;
+	//
 	private ContactService contactService = new ContactServiceImpl();
 
 	public List<Organization> getOrgById(Integer id) {
@@ -67,9 +80,9 @@ public class OrgServiceImpl implements OrgService {
 		return org;
 	}
 
-	public Integer saveOrgReturnId(Organization org) {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer insertOrgService(Organization org) {
+		orgDao.insertOrg(org);
+		return org.getId();
 	}
 
 	public Summary getSummary() {

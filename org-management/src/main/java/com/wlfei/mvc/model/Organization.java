@@ -1,7 +1,9 @@
 package com.wlfei.mvc.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ibatis.javassist.expr.NewArray;
 import org.springframework.beans.BeanUtils;
 
 import com.wlfei.mvc.service.ConfigService;
@@ -13,23 +15,22 @@ import com.wlfei.mvc.service.impl.ConfigServiceImpl;
  *
  */
 public class Organization {
-	private ConfigService configService = new ConfigServiceImpl();
-	int id;  // 数据库 id
-	String orgName;  // 机构简称
-	String orgFullname;  // 机构全称
-	String orgcode9;  // 9 位机构代码
-	String orgcode18; // 18 位机构代码
-	int gameStage; // 接入阶段
-	int gameMode; // 接入方式
-	String testIp; // 测试ip
-	String testKey; // 测试Key
-	String proIp; // 生产ip
-	String proKey; // 生产Key
-	List<Contact> contactList; // 机构联系人
-	String regDate; // 登记时间
-	boolean isDelete; // 删除标记  0 未删除 1 删除
-	String address; //快递地址
-	String note; //备注
+	int id=-1;  // 数据库 id
+	String orgName="";  // 机构简称
+	String orgFullname="";  // 机构全称
+	String orgcode9="";  // 9 位机构代码
+	String orgcode18=""; // 18 位机构代码
+	int gameStage=-1; // 接入阶段
+	int gameMode=-1; // 接入方式
+	String testIp=""; // 测试ip
+	String testKey=""; // 测试Key
+	String proIp=""; // 生产ip
+	String proKey=""; // 生产Key
+	List<Contact> contactList=new ArrayList<Contact>(); // 机构联系人
+	String regDate=""; // 登记时间
+	boolean isDelete=false; // 删除标记  0 未删除 1 删除
+	String address=""; //快递地址
+	String note=""; //备注
 	
 	public String getAddress() {
 		return address;
@@ -132,7 +133,9 @@ public class Organization {
 		return "Organization [id=" + id + ", orgName=" + orgName + ", orgFullname=" + orgFullname + ", orgcode9="
 				+ orgcode9 + ", orgcode18=" + orgcode18 + ", gameStage=" + gameStage + ", gameMode=" + gameMode
 				+ ", testIp=" + testIp + ", testKey=" + testKey + ", proIp=" + proIp + ", proKey=" + proKey
-				+ ", contactList=" + contactList + ", regDate=" + regDate + ", note=" + note + "]";
+				+ ", contactList=" + contactList + ", regDate=" + regDate + ", isDelete=" + isDelete + ", address="
+				+ address + ", note=" + note + "]";
 	}
+	
 	
 }

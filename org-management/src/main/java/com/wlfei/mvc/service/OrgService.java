@@ -23,7 +23,7 @@ public interface OrgService {
 	List<Organization> getTopNOrgList(Integer topn);
 	
 	// 插入机构信息，返回机构id
-	Integer saveOrgReturnId(Organization org);
+	Integer insertOrgService(Organization org);
 	
 	// 简易报表
 	Summary getSummary();
