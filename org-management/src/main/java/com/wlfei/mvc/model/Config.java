@@ -2,20 +2,13 @@ package com.wlfei.mvc.model;
 
 // 配置bean
 public class Config {
-	private int id;
 	private String key;
 	private String subKey;
 	private String value;
-	private String note;
+	
 	@Override
 	public String toString() {
-		return "Config [id=" + id + ", key=" + key + ", subKey=" + subKey + ", value=" + value + ", note=" + note + "]";
-	}
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
+		return "Config [key=" + key + ", subKey=" + subKey + ", value=" + value + "]";
 	}
 	public String getKey() {
 		return key;
@@ -34,11 +27,5 @@ public class Config {
 	}
 	public void setValue(String value) {
 		this.value = value;
-	}
-	public String getNote() {
-		return note;
-	}
-	public void setNote(String note) {
-		this.note = note;
 	}
 }

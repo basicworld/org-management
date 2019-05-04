@@ -1,13 +1,16 @@
 package com.wlfei.mvc.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.wlfei.mvc.controller.MainController;
 import com.wlfei.mvc.dao.OrgDao;
 import com.wlfei.mvc.model.Organization;
@@ -24,10 +27,11 @@ public class OrgServiceImpl implements OrgService {
 	//
 	private ContactService contactService = new ContactServiceImpl();
 
-	public List<Organization> getOrgById(Integer id) {
-		List<Organization> orgList = new ArrayList<Organization>();
-		orgList.add(this.demoGetOneOrg());
-		return orgList;
+	public List<Organization> getOrgByIdService(Integer id) {
+		if (id == null || id < 1) {
+			return new ArrayList<Organization>();
+		}
+		return orgDao.selectById(id);
 	}
 
 	public Organization getOrgByOrgcode9(String orgcode9) {
@@ -50,39 +54,18 @@ public class OrgServiceImpl implements OrgService {
 		return null;
 	}
 
-	public List<Organization> getTopNOrgList(Integer topn) {
-		List<Organization> orgList = new ArrayList<Organization>();
-		for (int i = 0; i < topn; i++) {
-			Organization org = this.demoGetOneOrg();
-			org.setId(i + 1);
-			org.setOrgName(org.getOrgName() + (i + 1));
-			orgList.add(org);
+	public List<Organization> selectRecentRegOrgService(Integer topn) {
+		if (topn == null || topn < 1) {
+			return new ArrayList<Organization>();
 		}
-		return orgList;
+		return orgDao.selectRecentRegOrg(topn);
 	}
 
-	private Organization demoGetOneOrg() {
-		Organization org = new Organization();
-		org.setId(1);
-		org.setOrgName("百度");
-		org.setOrgFullname("百度有限公司");
-		org.setOrgcode9("123456789");
-		org.setOrgcode18("222333444123456789");
-		org.setGameStage(1);
-		org.setGameMode(2);
-		org.setTestIp("1.1.1.1");
-		org.setTestKey("asdggrrwegvfdvg3rw34");
-		org.setProIp("2.2.2.2");
-		org.setProKey("sadfaskjgireoqy888824");
-		org.setContactList(contactService.getContactListByOrgId(1));
-		org.setRegDate("2019-04-21");
-		org.setNote("会员机构");
-		return org;
-	}
-
-	public Integer insertOrgService(Organization org) {
+	public void insertOrgService(Organization org) {
 		orgDao.insertOrg(org);
-		return org.getId();
+	}
+	public void updateOrgService(Organization org) {
+		orgDao.updateOrg(org);
 	}
 
 	public Summary getSummary() {
@@ -99,19 +82,50 @@ public class OrgServiceImpl implements OrgService {
 		return summary;
 	}
 
-	public List<Organization> getOrgListByPage(Integer pageNum, Integer pageSize) {
-		List<Organization> orgList = new ArrayList<Organization>();
-		int startId = pageNum * pageSize;
-		for (int i = startId; i < pageSize + startId; i++) {
-			Organization org = this.demoGetOneOrg();
-			org.setId(i + 1);
-			org.setOrgName(org.getOrgName() + (i + 1));
-			orgList.add(org);
-			if (i >= 85) {
-				break;
-			}
+	public List<Organization> getOrgListByPageService(Integer pageNum, Integer pageSize) {
+		// 非法值判断，如果小于0 则返回空列表
+		if (pageNum == null || pageSize == null || pageNum < 1 || pageSize < 1) {
+			return new ArrayList<Organization>();
 		}
-		return orgList;
+		return orgDao.selectByPage((pageNum - 1) * pageSize, pageSize);
+	}
+
+	@Override
+	public String orgCheckService(String checkType, String checkValue, Integer id) {
+		Boolean valid = true;
+		switch (checkType) {
+		case "orgcode18":
+			List<Organization>orgList = orgDao.selectByOrgcode18(checkValue);
+			// 返回的机构列表，如果存在不是本机构的其他机构，说明该机构的orgcode18 已经存在，校验不通过
+			for(Organization org: orgList) {
+				if (org.getId() != id) {valid=false; break;}
+			}
+			break;
+		default:
+			valid = true;
+			break;
+		}
+		
+		// 返回json格式的string
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("valid", valid);
+		return JSON.toJSON(resultMap).toString();
+	}
+
+	@Override
+	public List<Organization> getOrgListByParmService(String searchParm, Integer pageNum, Integer pageSize) {
+		log.debug("getOrgListByParmService searchParm=" + searchParm + " pageNum=" + pageNum + " pageSize=" + pageSize);
+		// 非法值判断，如果小于0 则返回空列表
+		if (pageNum == null || pageSize == null || pageNum < 1 || pageSize < 1) {
+			return new ArrayList<Organization>();
+		}
+		// 如果searchParm 是空值，则返回所有机构的列表  分页返回
+		if(searchParm == null || searchParm=="") {
+			return getOrgListByPageService(pageNum, pageSize);
+		}
+		
+		// 如果searchParm 不为空
+		return orgDao.selectByParmAndPage(searchParm, (pageNum - 1) * pageSize, pageSize);
 	}
 
 }

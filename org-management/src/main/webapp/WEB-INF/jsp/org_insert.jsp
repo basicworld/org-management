@@ -25,6 +25,14 @@
 				</div>
 			</div>
 
+			<div class="form-group" style="display: none">
+				<label for="id" class="col-sm-2 control-label">机构ID <em
+					class="boldRed">*</em></label>
+				<div class="col-sm-6">
+					<input name="id" type="text" class="form-control input-sm" id="id"
+						placeholder="机构ID" readonly value="0">
+				</div>
+			</div>
 			<div class="form-group">
 				<label for="orgName" class="col-sm-2 control-label">机构简称 <em
 					class="boldRed">*</em></label>
@@ -63,20 +71,16 @@
 				<label for="gameMode" class="col-sm-2 control-label">接入方式</label>
 				<div class="col-sm-2">
 					<select id="gameMode" name="gameMode" class="form-control input-sm">
-						<option value="1">网页接入</option>
-						<option value="2">接口接入</option>
-						<option value="3">进登记</option>
+						<!-- option load from js -->
 					</select>
 				</div>
-				<!-- 			</div> -->
-				<!-- 			<div class="form-group"> -->
+				<!-- </div> -->
+				<!-- <div class="form-group"> -->
 				<label for="gameStage" class="col-sm-2 control-label">接入阶段</label>
 				<div class="col-sm-2">
 					<select id="gameStage" name="gameStage"
 						class="form-control input-sm">
-						<option value="1">培训阶段</option>
-						<option value="2">联调阶段</option>
-						<option value="3">生产阶段</option>
+						<!-- option load from js -->
 					</select>
 				</div>
 			</div>

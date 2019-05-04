@@ -1,7 +1,9 @@
 package com.wlfei.mvc.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,6 +36,8 @@ import com.wlfei.mvc.service.impl.OrgServiceImpl;
 @Controller
 @RequestMapping("/oms") // organization management system机构管理平台
 public class MainController {
+	// 分页用
+	private int pageSize = 20;
 	// 从配置库查询config信息的service 依赖mybatis
 	@Autowired
 	private ConfigService configService;
@@ -73,22 +77,27 @@ public class MainController {
 		String pageName = request.getParameter("pageName");
 		log.info("getOrgList pageType:" + pageName);
 		switch (pageName) {
-		case "summary": // summary 页面请求，返回最近新增的6家机构
-			return orgService.getTopNOrgList(6);
+		case "summary": // summary 页面请求，返回最近新增的5家机构
+			int topn = 5;
+			return orgService.selectRecentRegOrgService(5);
 			
 		case "org_list": // org_list 页面请求
+			
 			String searchParm = request.getParameter("searchParm");
 			int pageNum = Integer.parseInt(request.getParameter("pageNum"));
-			// 请求关键字不为空则按条件查询  否则按全部机构数查询
+			log.debug("getOrgLis--case org_list: searchParm=" + searchParm + " pageNum= " + pageNum);
+			// 请求关键字为空则查询全部机构  否则按条件查询
 			if (searchParm == null || searchParm == "") {
-				return orgService.getTopNOrgList(6);
+				// 查询全部机构
+				return orgService.getOrgListByPageService(pageNum, pageSize);
 			} else {
-				return orgService.getOrgListByPage(pageNum, 20);
+				// 按关键字查询
+				return orgService.getOrgListByParmService(searchParm, pageNum, pageSize);
 			}
 		case "org_detail":
-			return orgService.getOrgById(Integer.parseInt(request.getParameter("searchParm")));
+			return orgService.getOrgByIdService(Integer.parseInt(request.getParameter("searchParm")));
 		case "org_edit":
-			return orgService.getOrgById(Integer.parseInt(request.getParameter("searchParm")));
+			return orgService.getOrgByIdService(Integer.parseInt(request.getParameter("searchParm")));
 		default:
 			break;
 		}
@@ -99,9 +108,11 @@ public class MainController {
 	@ResponseBody
 	public List<String> updateOrgList(HttpServletRequest request) {
 		List<Organization> orgList = JSON.parseArray(request.getParameter("orgList"), Organization.class) ;
-		log.info("updateOrgList" + orgList.get(0));
 		List<String> ids = new ArrayList<String>();
-		ids.add("" + orgList.get(0).getId());
+		for(Organization org: orgList) {
+			orgService.updateOrgService(org);
+			ids.add("" + org.getId());
+		}
 		return ids; // 返回机构id的列表  列表是为了支持多机构的批量修改
 	}
 	// insert new  org list
@@ -111,11 +122,23 @@ public class MainController {
 		List<Organization> orgList = JSON.parseArray(request.getParameter("orgList"), Organization.class) ;
 		List<String> ids = new ArrayList<String>();
 		for(Organization org: orgList) {
-			ids.add("" + orgService.insertOrgService(org));
+			orgService.insertOrgService(org);
+			ids.add("" + org.getId());
 		}
 		return ids; // 返回机构id的列表  列表是为了支持多机构的批量修改
 	}
 	///////////////// organization controller end ////////////////////////
+	// 检查数据合法性
+	@RequestMapping(value = {"/orgcheck"}, method = RequestMethod.GET)
+	@ResponseBody
+	public String orgCheck(HttpServletRequest request) {
+		String checkType = request.getParameter("checkType");
+		String checkValue = request.getParameter("checkValue");
+		int id = Integer.parseInt(request.getParameter("id"));
+		
+		log.debug("orgCheck: " + checkType + " " + checkValue);
+		return orgService.orgCheckService(checkType, checkValue, id);
+	}
 
 	// 获取首页的数据
 	@RequestMapping(value = "/summary", method = RequestMethod.GET)
@@ -126,9 +149,9 @@ public class MainController {
 	}
 
 	// 获取配置表信息config
-	@RequestMapping(value = "/config", method = RequestMethod.POST)
-	public @ResponseBody List<Config> getConfig1(@RequestBody Config config) {
-		log.info("get query config: {} ", config);
+	@RequestMapping(value = "/config", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Config> getConfig(Config config) {
 		return configService.getConfigService(config);
 	}
 

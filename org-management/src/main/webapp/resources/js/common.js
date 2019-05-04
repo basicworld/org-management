@@ -1,11 +1,13 @@
 // 
 $(document).ready(function() {
 	toastr.options.positionClass = 'toast-bottom-right';
+	
 	// 初次加载后，显示概览页--首页
 	loadPage("summary", "#content", function(){
 		initSummaryPage();
 		toastr.info('欢迎登陆:' + "wlifei");
 	});
+	
 	
 });
 // 用模板渲染 areaId处的网页
@@ -62,13 +64,15 @@ function refresh(){
 function renderOrgPage(org, pos, parentId){
 	org = unpackOrgData(org);
 //	toastr.info("加载机构信息："+org["orgName"]);
-	targetIds = ["orgName", "orgFullname", "orgcode18", "orgcode9", "gameMode", "gameStage", "testIp", "proIp", "name1", "phone1", "email1", "name2", "phone2", "email2", "regDate", "note",];
+	targetIds = ["id", "orgName", "orgFullname", "orgcode18", "orgcode9", "gameMode", "gameStage", "testIp", "proIp", "name1", "phone1", "email1", "name2", "phone2", "email2", "regDate", "note",];
 	for (var i=0; i< targetIds.length; i++){
 		targetId = targetIds[i];
 		if(pos == "val"){
 			$(parentId).find("#" + targetId).val(org[targetId]);
 			
 		} else if(pos == "text"){
+			if (targetId == "gameMode"){org[targetId] = getConfig("gameMode", org[targetId]);}
+			if (targetId == "gameStage"){org[targetId] = getConfig("gameStage", org[targetId]);}
 			$(parentId).find("#" + targetId).text(org[targetId]);
 			
 		}
@@ -89,6 +93,9 @@ function showOrgDetail(e){
 	loadPage("org_detail","#content", function(){
 		var pageParm = {"pageNum": 0, "pageName": "org_detail", "searchParm":id};
 		$("#pageParm").attr("value", JSON.stringify(pageParm));
+		$("#editBtn").attr("orgid", id);
+		$("#downloadBtn").attr("orgid", id);
+		$("#deleteBtn").attr("orgid", id);
 		getOrgList(function(pageParm, orgList){
 			org = orgList[0];
 			renderOrgPage(org, "text", "#orgDetailTable");
@@ -142,12 +149,11 @@ function editOrg(e){
 			loadPage("org_list","#content", function(){ 
 				getOrgList(renderOrgListPage); // 获取机构 加载机构到页面
 			});
-			toastr.info('修改成功，返回到列表页面');
 		});
 		// 构建查询参数 查询机构信息后渲染到机构编辑页面
 		var pageParm = {"pageNum": 0, "pageName": "org_edit", "searchParm":id};
 		$("#pageParm").attr("value", JSON.stringify(pageParm));
-		toastr.info("editOrg:"+JSON.stringify(pageParm));
+//		toastr.info("editOrg:"+JSON.stringify(pageParm));
 		getOrgList(function(pageParm, orgList){
 			org = orgList[0];
 			renderOrgPage(org, "val", "#defaultForm");
@@ -226,25 +232,24 @@ function getNow() {
  
 };
 // 加载机构列表 到机构列表页面用于org_list
-function renderOrgListPage(pageParm, data){
-	console.log("renderOrgListPage");
+function renderOrgListPage(pageParm, orgList){
+	console.log("renderOrgListPage orgList.length=" + orgList.length);
 	$("#orgTableBody").empty(); // 清空数据
 	var pageNum = parseInt(pageParm.pageNum);
-	var orgList = data;
 	var org;
 	var actionHtml = "<div><a href='#' onclick='showOrgDetail(this)' orgId=''> 详情</a> <a href='#' onclick='editOrg(this)' orgId=''> 编辑</a> <a href='#' onclick='delOrg(this)' orgId=''> 删除</a></div>";
 	for (var i = 0; i < orgList.length; i++) {
 		org = orgList[i];
-		var text = "<tr> <td class='orgId'></td><td class='orgName'></td> <td class='orgFullname'></td><td class='orgcode18'></td> <td class='gameModeStage'></td> <td class='regDate'></td><td class='action'></td> </tr>";
+		var text = "<tr> <td class='orgId'></td><td class='orgName'></td> <td class='orgFullname'></td><td class='orgcode18'></td> <td class='gameStage'></td> <td class='regDate'></td><td class='action'></td> </tr>";
 		var trObj = $(text);
 		$(".orgId", trObj).text(org.id);
 		$(".orgName", trObj).text(org.orgName);
 		$(".orgFullname", trObj).text(org.orgFullname);
 		$(".orgcode18", trObj).text(org.orgcode18);
 		
-		var gameMode = getConfig("gameMode", org.gameMode);
+//		var gameMode = getConfig("gameMode", org.gameMode);
 		var gameStage = getConfig("gameStage", org.gameStage);
-		$(".gameModeStage", trObj).text(gameMode+ "-" + gameStage);
+		$(".gameStage", trObj).text(gameStage);
 		
 		$(".regDate", trObj).text(org.regDate);
 		
@@ -382,7 +387,24 @@ function loadSummary() {
 // //////////////////////content js end/////////////////////////////
 // 初始化新建机构页面的js动作
 function initOrgInsertPage(callback){
-	console.log("in initOrgInsertPage");
+	var pageParm = JSON.parse($("#pageParm").attr("value"));
+	// 构建select
+	var gameModes = getConfig("gameMode");
+	for(key in gameModes){
+		var text = '<option value=""></option>';
+		var optionObj = $(text);
+		optionObj.attr("value", key);
+		optionObj.text(gameModes[key]);
+		$('select[name="gameMode"]').append(optionObj);
+	}
+	var gameStages = getConfig("gameStage");
+	for(key in gameStages){
+		var text = '<option value=""></option>';
+		var optionObj = $(text);
+		optionObj.attr("value", key);
+		optionObj.text(gameStages[key]);
+		$('select[name="gameStage"]').append(optionObj);
+	}
 	// orgcode9 自动生成
 	$("#orgcode18").blur(function(){
 		if($.trim(this.value).length == 18){
@@ -443,6 +465,21 @@ function initOrgInsertPage(callback){
 		                    min: 18,
 		                    max: 18,
 		                    message: '统一社会信用代码必须为18位'
+		                },
+		                remote: {
+		                	type: 'GET',
+		                	url: window.location.protocol + "//" + window.location.host + "/oms/orgcheck",
+		                	message: '统一社会信用代码重复，无法提交',
+		                	data: {
+		                		checkValue: function() {
+	                              return $('input[name="orgcode18"]').val();
+	                              },
+	                            checkType: "orgcode18",
+	                            id: function() {
+		                              return $('input[name="id"]').val();
+	                              },
+	                        },
+		                	delay: 1000,
 		                },
 		                regexp: {
 	                        regexp: /^[a-zA-Z0-9]+$/,
@@ -567,11 +604,12 @@ function initSummaryPage() {
 			var org;
 			for (var i = 0; i < orgList.length; i++) {
 				org = orgList[i];
-				var text = "<tr> <td class='listId'></td> <td class='orgFullname'></td> <td class='gameModeStage'></td> <td class='regDate'></td> </tr>";
+				var text = "<tr> <td class='listId'></td> <td class='orgName'></td> <td class='orgFullname'></td> <td class='gameStage'></td> <td class='regDate'></td> </tr>";
 				var trObj = $(text);
-				$(".listId", trObj).text(i+1);
+				$(".listId", trObj).text(org.id);
+				$(".orgName", trObj).text(org.orgName);
 				$(".orgFullname", trObj).text(org.orgFullname);
-				$(".gameModeStage", trObj).text(org.gameMode+ " " + org.gameStage);
+				$(".gameStage", trObj).text(getConfig("gameStage", org.gameStage));
 				$(".regDate", trObj).text(org.regDate);
 				$("#recentOrgTableBody").append(trObj);
 			} // end for
@@ -580,9 +618,25 @@ function initSummaryPage() {
 }
 
 function getConfig(key, subKey){
+	var configs = {};
+	$.ajax({
+		type : "GET",
+		url : window.location.protocol + "//" + window.location.host + "/oms/config",
+		async: true,
+		data: {"key": key, "subKey":subKey},
+		dataType: 'json',
+		success : function(data, status, jqXHR) {
+			for (conf in data){
+				conf
+			};
+		},
+		error: function(){
+			toastr.error("getOrgList error：服务器连接失败");
+		}
+	}); // end ajax
 	var configs = {
-		"gameMode": {"1": "网页", "2": "接口"},
-		"gameStage": {"2": "联调阶段", "3": "生产阶段", "1": "培训阶段"},
+		"gameMode": {"1": "网页", "2": "接口", "3":"业务发生机构", "99":"未确定"},
+		"gameStage": { "1": "培训阶段", "2": "联调阶段", "3": "生产阶段", "99":"退出接入"},
 	};
 	if (key != null && subKey !=null) {
 		return configs[key][subKey];

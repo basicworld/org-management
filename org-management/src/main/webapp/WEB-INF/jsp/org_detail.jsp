@@ -14,16 +14,17 @@
 			</button>
 		</div>
 		<div id="rightWell" style="text-align: right;" class="col-sm-6">
-			<button class='btn btn-sm btn-default' id='editBtn'
-				onclick='editPage()'>
+			<button class='btn btn-sm btn-default' id='editBtn' orgid=""
+				onclick='editOrg(this)'>
 				<span class='glyphicon glyphicon-edit'></span> 编辑
 			</button>
 			&nbsp;&nbsp;
-			<button class='btn btn-sm btn-default' id='downloadBtn'>
+			<button class='btn btn-sm btn-default' id='downloadBtn' orgid="">
 				<span class='glyphicon glyphicon-cloud-download'></span> 下载
 			</button>
 			&nbsp;&nbsp;
-			<button class='btn btn-sm btn-danger' id='deleteBtn' onclick='delOrg(this,false,prevPageBtnAction)'>
+			<button class='btn btn-sm btn-danger' id='deleteBtn' orgid=""
+				onclick='delOrg(this,false,prevPageBtnAction)'>
 				<span class='glyphicon glyphicon-trash'></span> 删除
 			</button>
 		</div>
@@ -47,8 +48,14 @@
 					<td id="orgcode18"></td>
 				</tr>
 				<tr>
+					<td bgcolor="#eee"><strong>接入方式</strong></td>
+					<td id="gameMode"></td>
 					<td bgcolor="#eee"><strong>接入阶段</strong></td>
-					<td><txt id="gameMode"></txt> <txt id="gameStage"></txt></td>
+					<td id="gameStage"></td>
+				</tr>
+				<tr>
+					<td bgcolor="#eee"><strong>机构ID</strong></td>
+					<td id="id"></td>
 					<td bgcolor="#eee"><strong>登记日期</strong></td>
 					<td id="regDate"></td>
 				</tr>
