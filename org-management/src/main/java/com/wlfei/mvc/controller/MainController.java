@@ -69,7 +69,7 @@ public class MainController {
 	
 	
 	///////////////// organization controller start ////////////////////////
-	// get org list
+	// get org list  获取机构
 	@RequestMapping(value = {"/orgs"}, method = RequestMethod.GET)
 	@ResponseBody
 	public List<Organization> getOrgList(HttpServletRequest request) {
@@ -79,7 +79,7 @@ public class MainController {
 		switch (pageName) {
 		case "summary": // summary 页面请求，返回最近新增的5家机构
 			int topn = 5;
-			return orgService.selectRecentRegOrgService(5);
+			return orgService.selectRecentRegOrgService(topn);
 			
 		case "org_list": // org_list 页面请求
 			
@@ -103,7 +103,7 @@ public class MainController {
 		}
 		return null;
 	}
-	// update org list
+	// update org list 修改机构
 	@RequestMapping(value = {"/orgs"}, method = RequestMethod.PUT)
 	@ResponseBody
 	public List<String> updateOrgList(HttpServletRequest request) {
@@ -115,7 +115,7 @@ public class MainController {
 		}
 		return ids; // 返回机构id的列表  列表是为了支持多机构的批量修改
 	}
-	// insert new  org list
+	// insert new  org list  新增机构
 	@RequestMapping(value = {"/orgs"}, method = RequestMethod.POST)
 	@ResponseBody
 	public List<String> insertOrgList(HttpServletRequest request) {

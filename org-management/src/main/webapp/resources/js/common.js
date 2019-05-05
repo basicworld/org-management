@@ -126,16 +126,25 @@ function delOrg(e, confirm, callback){
 		}
 		toastr.error('再次点击删除按钮执行删除');
 	} else if( confirm == true ){ // 真正执行删除
-		// todo  ajax 执行删除
+		$.ajax({
+			method : "GET",
+			url : window.location.protocol + "//" + window.location.host + "/oms/page/" + pageName,
+			async: false,
+			data: {},
+			success : function(data, status, jqXHR) {
+				$(areaId).html(data);  // 加载静态页面
+				if (typeof callback === "function"){
+			        callback();
+			    }
+			},
+			error: function(){
+				toastr.error("loadPage error：服务器连接失败");
+			}
+		}); // end ajax
 		toastr.error("删除成功");
 		if(typeof callback == 'function' ){
 			callback();
 		}
-//		if (pageParm.pageName == "org_list"){
-//			refresh();
-//		}else if(pageParm.pageName == "org_detail"){
-//			
-//		}
 	}
 }
 // 修改机构 
