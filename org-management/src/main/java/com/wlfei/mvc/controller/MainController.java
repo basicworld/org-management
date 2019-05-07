@@ -110,6 +110,7 @@ public class MainController {
 		List<Organization> orgList = JSON.parseArray(request.getParameter("orgList"), Organization.class) ;
 		List<String> ids = new ArrayList<String>();
 		for(Organization org: orgList) {
+			log.info("updateOrgList:" + org);
 			orgService.updateOrgService(org);
 			ids.add("" + org.getId());
 		}
@@ -122,6 +123,7 @@ public class MainController {
 		List<Organization> orgList = JSON.parseArray(request.getParameter("orgList"), Organization.class) ;
 		List<String> ids = new ArrayList<String>();
 		for(Organization org: orgList) {
+			log.info("org= " + org);
 			orgService.insertOrgService(org);
 			ids.add("" + org.getId());
 		}

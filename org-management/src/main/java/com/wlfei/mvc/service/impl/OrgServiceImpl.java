@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.javassist.expr.NewArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.wlfei.mvc.controller.MainController;
+import com.wlfei.mvc.dao.ContactDao;
 import com.wlfei.mvc.dao.OrgDao;
 import com.wlfei.mvc.model.Organization;
 import com.wlfei.mvc.model.Summary;
@@ -24,14 +26,26 @@ public class OrgServiceImpl implements OrgService {
 	// dao
 	@Autowired
 	private OrgDao orgDao;
-	//
-	private ContactService contactService = new ContactServiceImpl();
-
+	@Autowired
+	private ContactDao contactDao;
+	
+	// 给多个机构查询联系人列表
+	private List<Organization> getContactListForOrgList(List<Organization> orgList) {
+		if (orgList == null){
+			return new ArrayList<Organization>();
+		}
+		for(Organization org: orgList) {
+			org.setContactList(contactDao.selectByOrgId(org.getId()));
+		}
+		return orgList;
+	}
+	
+	// 根据机构id获取机构
 	public List<Organization> getOrgByIdService(Integer id) {
 		if (id == null || id < 1) {
 			return new ArrayList<Organization>();
 		}
-		return orgDao.selectById(id);
+		return getContactListForOrgList(orgDao.selectById(id));
 	}
 
 	public Organization getOrgByOrgcode9(String orgcode9) {
@@ -58,7 +72,7 @@ public class OrgServiceImpl implements OrgService {
 		if (topn == null || topn < 1) {
 			return new ArrayList<Organization>();
 		}
-		return orgDao.selectRecentRegOrg(topn);
+		return getContactListForOrgList(orgDao.selectRecentRegOrg(topn));
 	}
 
 	public void insertOrgService(Organization org) {
@@ -67,19 +81,9 @@ public class OrgServiceImpl implements OrgService {
 	public void updateOrgService(Organization org) {
 		orgDao.updateOrg(org);
 	}
-
+	// 获取机构统计汇总信息
 	public Summary getSummary() {
-		Summary summary = new Summary();
-		summary.setProIntCount(1);
-		summary.setProTotalCount(1);
-		summary.setProWebCount(1);
-		summary.setTestIntCount(1);
-		summary.setTestTotalCount(1);
-		summary.setTestWebCount(1);
-		summary.setIntCount(1);
-		summary.setTotalCount(1);
-		summary.setWebCount(1);
-		return summary;
+		return orgDao.selectSummary();
 	}
 
 	public List<Organization> getOrgListByPageService(Integer pageNum, Integer pageSize) {

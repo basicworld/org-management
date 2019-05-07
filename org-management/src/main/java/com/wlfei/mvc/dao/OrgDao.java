@@ -10,8 +10,23 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.wlfei.mvc.model.Organization;
+import com.wlfei.mvc.model.Summary;
 @Mapper
 public interface OrgDao {
+	// 获取机构汇总信息
+	@Select(value="SELECT pi.proIntCount, pw.proWebCount, ti.testIntCount, tw.testWebCount, " + 
+			"pi.proIntCount + pw.proWebCount  AS  proTotalCount," + 
+			"ti.testIntCount + tw.testWebCount AS testTotalCount," + 
+			"pi.proIntCount + ti.testIntCount  AS  intCount," + 
+			"pw.proWebCount  + tw.testWebCount AS webCount," + 
+			"pi.proIntCount + pw.proWebCount + ti.testIntCount + tw.testWebCount AS totalCount" + 
+			" FROM (" + 
+			"(SELECT COUNT(*) AS proIntCount FROM organization o WHERE o.game_stage=3 AND o.game_mode=2) pi," + 
+			"(SELECT COUNT(*) AS proWebCount FROM organization o WHERE o.game_stage=3 AND o.game_mode=1) pw," + 
+			"(SELECT COUNT(*) AS testIntCount FROM organization o WHERE o.game_stage=2 AND o.game_mode=2) ti," + 
+			"(SELECT COUNT(*) AS testWebCount FROM organization o WHERE o.game_stage=2 AND o.game_mode=1) tw)")
+	public Summary selectSummary();
+	
 	// 获取最近添加的N家机构
 	@Select(value="SELECT id,org_name as orgName,org_fullname as orgFullname,orgcode9,orgcode18,game_mode as gameMode,game_stage as gameStage,test_ip as testIp,test_key as testKey,pro_ip as proIp,pro_key as proKey,address,reg_date as regDate,note "
 			+ "FROM organization WHERE is_delete!=1 ORDER BY reg_date DESC LIMIT #{limitNum}")

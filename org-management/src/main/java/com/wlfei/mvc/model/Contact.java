@@ -7,13 +7,13 @@ package com.wlfei.mvc.model;
  */
 public class Contact {
 	
-	int id;  // 数据库 id
-	int orgId;  // 机构id
-	String name;  //姓名
-	String position; // 职务
-	String phone;  // 电话
-	String email;  // 邮箱
-	String note;  // 备注
+	int id = -1;  // 数据库 id
+	int orgId = -1;  // 机构id
+	String name = "";  //姓名
+	String position = ""; // 职务
+	String phone = "";  // 电话
+	String email = "";  // 邮箱
+	String note = "";  // 备注
 	public int getId() {
 		return id;
 	}

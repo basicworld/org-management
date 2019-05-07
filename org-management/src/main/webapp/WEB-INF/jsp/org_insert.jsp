@@ -109,8 +109,12 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="name1" class="col-sm-2 control-label">联系人一</label> <label
-					for="lastname" class="col-sm-1 control-label">姓名</label>
+				<label for="name1" class="col-sm-2 control-label">联系人一</label>
+				<div style="display: none">
+					<input name="uid1" type="text" class="form-control input-sm"
+						id="uid2" placeholder="联系人一ID" readonly value="0">
+				</div>
+				<label for="lastname" class="col-sm-1 control-label">姓名</label>
 				<div class="col-sm-2">
 					<input id="name1" name="name1" type="text"
 						class="form-control input-sm" id="" placeholder=""> <span
@@ -132,8 +136,12 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="name2" class="col-sm-2 control-label">联系人二</label> <label
-					for="lastname" class="col-sm-1 control-label">姓名</label>
+				<label for="name2" class="col-sm-2 control-label">联系人二</label>
+				<div style="display: none">
+					<input name="uid2" type="text" class="form-control input-sm"
+						id="uid2" placeholder="联系人二ID" readonly value="0">
+				</div>
+				<label for="lastname" class="col-sm-1 control-label">姓名</label>
 				<div class="col-sm-2">
 					<input id="name2" name="name2" type="text"
 						class="form-control input-sm" id="" placeholder="">

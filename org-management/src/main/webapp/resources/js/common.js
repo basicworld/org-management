@@ -176,10 +176,14 @@ function buildOrgFormData(array){
 	contact1['name']=array.name1; delete(array.name1);
 	contact1['phone']=array.phone1; delete(array.phone1);
 	contact1['email']=array.email1; delete(array.email1);
+	contact1['id']=array.uid1; delete(array.uid1);
+	contact1['orgId']=array.id;
 	var contact2 = {};
 	contact2['name']=array.name2; delete(array.name2);
 	contact2['phone']=array.phone2; delete(array.phone2);
 	contact2['email']=array.email2; delete(array.email2);
+	contact2['id']=array.uid2; delete(array.uid2);
+	contact2['orgId']=array.id;
 	array["contactList"]=[];
 	array["contactList"].push(contact1);
 	array["contactList"].push(contact2);
@@ -191,9 +195,11 @@ function unpackOrgData(org){
 		org.name1="";
 		org.phone1="";
 		org.email1="";
+		org.uid1="";
 		org.name2="";
 		org.phone2="";
 		org.email2="";
+		org.uid2="";
 		
 	}else {
 		contactList = org.contactList.reverse();
@@ -202,12 +208,14 @@ function unpackOrgData(org){
 			org.name1=contact1.name;
 			org.phone1=contact1.phone;
 			org.email1=contact1.email;
+			org.uid1=contact1.id;
 		}
 		if (contactList.length >0){
 			contact2=contactList.pop();
-			org.name2=contact1.name;
-			org.phone2=contact1.phone;
-			org.email2=contact1.email;
+			org.name2=contact2.name;
+			org.phone2=contact2.phone;
+			org.email2=contact2.email;
+			org.uid2=contact2.id;
 		}
 	}
 	delete(org.contactList);

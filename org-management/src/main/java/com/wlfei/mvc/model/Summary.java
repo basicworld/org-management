@@ -6,15 +6,15 @@ package com.wlfei.mvc.model;
  *
  */
 public class Summary {
-	int proIntCount;
-	int proWebCount;
-	int proTotalCount;
-	int testIntCount;
-	int testWebCount;
-	int testTotalCount;
-	int intCount;
-	int webCount;
-	int totalCount;
+	int proIntCount;  // 生产接口接入
+	int proWebCount;  // 生产web接入
+	int proTotalCount;  // 生产总接入
+	int testIntCount;  // 测试接口接入
+	int testWebCount;  // 测试web接入
+	int testTotalCount;  // 测试总接入
+	int intCount;  // 接口总接入
+	int webCount; // web总接入
+	int totalCount;  // 接口+web总接入
 	public int getProIntCount() {
 		return proIntCount;
 	}
