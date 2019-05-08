@@ -112,7 +112,7 @@
 				<label for="name1" class="col-sm-2 control-label">联系人一</label>
 				<div style="display: none">
 					<input name="uid1" type="text" class="form-control input-sm"
-						id="uid2" placeholder="联系人一ID" readonly value="0">
+						id="uid1" placeholder="联系人一ID" readonly value="0">
 				</div>
 				<label for="lastname" class="col-sm-1 control-label">姓名</label>
 				<div class="col-sm-2">

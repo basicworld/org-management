@@ -64,7 +64,7 @@ function refresh(){
 function renderOrgPage(org, pos, parentId){
 	org = unpackOrgData(org);
 //	toastr.info("加载机构信息："+org["orgName"]);
-	targetIds = ["id", "orgName", "orgFullname", "orgcode18", "orgcode9", "gameMode", "gameStage", "testIp", "proIp", "name1", "phone1", "email1", "name2", "phone2", "email2", "regDate", "note",];
+	targetIds = ["id", "orgName", "orgFullname", "orgcode18", "orgcode9", "gameMode", "gameStage", "testIp", "proIp", "uid1", "name1", "phone1", "email1", "uid2", "name2", "phone2", "email2", "regDate", "note","address"];
 	for (var i=0; i< targetIds.length; i++){
 		targetId = targetIds[i];
 		if(pos == "val"){

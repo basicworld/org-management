@@ -90,7 +90,7 @@
 					<td id="email2"></td>
 				</tr>
 				<tr>
-					<td bgcolor="#eee"><strong>地址</strong></td>
+					<td bgcolor="#eee"><strong>快件地址</strong></td>
 					<td colspan="3" id="address"></td>
 				</tr>
 				<tr>
